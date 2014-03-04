@@ -23,6 +23,36 @@ class s3helper extends AmazonS3{
      }
 
      /**
+      * [get_all_files_json obtienes todos los SKINS]
+      * @return [array] [devuelve todas las posibles configuraciones de los skins]
+      */
+     public function get_all_files_json() {
+          $patron = "/[a-zA-Z0-9].js/i";
+          
+          $archivos = $this->get_object_list($this->bucketname, array(
+               "pcre" => "/colorama_landings/"
+          ));
+
+           if(!empty($archivos)){
+               $coincidencias = preg_grep($patron, $archivos);
+
+               foreach ($coincidencias as $value) {
+                    list($basura, $archivo) = explode("colorama_landings/", $value);
+
+                    $response["objetos"][] = $archivo;
+               }
+
+               $response["success"] = true;
+
+               return $response;
+          }else{
+               $response["success"] = false;               
+               
+               return $response;
+          }
+     }
+
+     /**
       * [get_files_json obtiene el nombre de todas las configuraciones ".json" creadas para los skins de las landings]
       * @return [array] [nombres de los json de los skins]
       */
@@ -73,8 +103,25 @@ class s3helper extends AmazonS3{
       * @return [null]
       */
      public function upload_generate_json($datos) {
+          $replica = null;
           $datos = json_decode($datos, true);
           $carpeta = "colorama_landings/" . $datos["dummy_portal"] . "/";
+
+          if(isset($datos["dummylayer_null"]) 
+          && !empty($datos["dummylayer_null"])) {
+               $replica = $datos["dummylayer_null"] . "===" . $datos["dummynombre_null"];
+               $datos["replica"] = $replica;
+
+               $result = $this->create_object($this->bucketname, $carpeta . $datos["dummylayer_null"] . ".js", array(
+                    "body"                   => json_encode($datos),
+                    "acl"                    => AmazonS3::ACL_PUBLIC,
+                    "contentType"            => "application/javascript",
+                    "headers"                => array(
+                       "Content-Encoding"    => "UTF-8",
+                       "Cache-Control"    => "max-age=60",
+                    ),
+               ));
+          }
 
           $result = $this->create_object($this->bucketname, $carpeta . $datos["dummynombre_null"] . ".js", array(
                "body"                   => json_encode($datos),  

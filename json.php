@@ -4,10 +4,20 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
      $datos = file_get_contents("https://b2c-docs.s3.amazonaws.com/colorama_landings/" . $nombrejs . ".js");
      $datosNombre = json_decode($datos, true);
 
-     header("Content-Description: File Transfer"); 
-     header("Content-Type: application/octet-stream");
-     header("Content-disposition: attachment; filename='" . $datosNombre["dummynombre_null"] . ".js'");
-     
+     if(isset($_GET["render"]) 
+     && $_GET["render"] == 1){
+          
+          header("Content-Description: File Transfer"); 
+          header("Content-Type: application/octet-stream");
+          header("Content-disposition: attachment; filename='" . $datosNombre["dummynombre_null"] . ".js'");
+     }else if(isset($_GET["render"])
+          && $_GET["render"] == 2){
+          
+          header("Content-Description: File Transfer"); 
+          header("Content-Type: application/octet-stream");
+          header("Content-disposition: attachment; filename='" . $datosNombre["dummylayer_null"] . ".js'");  
+     }
+
      echo $datos;
 }else{
      include "s3helper.php";

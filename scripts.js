@@ -5,8 +5,9 @@
 (function(){
      var ok = "#f2ffff";
      var ko = "#ffe3e3";
-     var _hexadecimal_ = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-     var _alfanumericos_ = /^[A-Za-z0-9]+$/;
+     var _numerico_ = /^[0-9]+$/;
+     var _alfanumericos_ = /^([A-Za-z0-9\_]{3,})+$/;
+     var _hexadecimal_ = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;          
      var _base64_ = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
      var _colorama_ = angular.module("App", ["colorpicker.module"]);
 
@@ -43,6 +44,32 @@
                               return viewValue;
                          } else {
                               ctrl.$setValidity("hexadecimal", false);
+                              elm.css("background", ko);
+                              
+                              return undefined;
+                         }
+                    });
+               }
+          };
+     });
+
+
+     /**
+      * [Validación de entrada de solo números]
+      * @return {[int | false]} [dependiendo de la validación]
+      */
+     _colorama_.directive("numerico", function() {
+          return {
+               require: "ngModel",
+               link: function(scope, elm, attrs, ctrl) {
+                    ctrl.$parsers.unshift(function(viewValue) {
+                         if (_numerico_.test(viewValue)) {
+                              ctrl.$setValidity("numerico", true);
+                              elm.css("background", ok);
+                              
+                              return viewValue;
+                         } else {
+                              ctrl.$setValidity("numerico", false);
                               elm.css("background", ko);
                               
                               return undefined;
@@ -153,14 +180,16 @@
  * [mainController controlador general de la aplicación]
  * @return {[null]} 
  */
-var mainController = function($rootScope, $scope, $http) {
-     $scope.listo = false;
+var mainController = function($rootScope, $scope, $window, $http) {
      $scope.Skins = {};
+     $scope.listo = false;
      $scope.Mcolorama = {};          
      $scope.envioDatos = true;
      $rootScope.rootImg = null;
      $rootScope.rootListImage = [];
-     
+     $scope.Portales = $window.Portales;
+     $scope.AllSkins = $window.AllSkins["objetos"];
+
      $rootScope.$watch(function() {
           $scope.Mcolorama.dummyimg_backgroundimage = $rootScope.rootImg;
      });
@@ -196,6 +225,7 @@ var mainController = function($rootScope, $scope, $http) {
                     $scope.formColorama.dummytexto_color.$setViewValue($scope.formColorama.dummytexto_color.$modelValue);
                     $scope.formColorama.dummyimg_backgroundimage.$setViewValue($scope.formColorama.dummyimg_backgroundimage.$modelValue);
                     $scope.formColorama.dummynombre_null.$setViewValue($scope.formColorama.dummynombre_null.$modelValue);
+                    $scope.formColorama.dummylayer_null.$setViewValue($scope.formColorama.dummylayer_null.$modelValue);
                }
 
                if($scope.formColorama.dummy_backgroundcolor.$valid
@@ -211,10 +241,16 @@ var mainController = function($rootScope, $scope, $http) {
 
                     $http.post("json.php", Mcolorama)
                     .success(function(data, status, headers, config){
-                         if(data["success"]){                                   
-                              alert("Se ha creado el SKIN correntamente: " + data["objeto"]["dummynombre_null"]);
+                         if(data["success"]){
+                              var texto = (data["objeto"]["dummylayer_null"])
+                              ? "Se ha creado el SKIN correntamente: " + data["objeto"]["dummynombre_null"] + "\ny el LAYER: " + data["objeto"]["dummylayer_null"]
+                              : "Se ha creado el SKIN correntamente: " + data["objeto"]["dummynombre_null"];
+
+                              alert(texto);
                               
-                              window.open("json.php?objetojson=" + data["objeto"]["dummynombre_null"] + "&portal=" + data["objeto"]["dummy_portal"], "_blank", "width=500,height=10");
+                              if(data["objeto"]["dummylayer_null"]) window.open("json.php?objetojson=" + data["objeto"]["dummylayer_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=2", "_blank", "width=500,height=10,left=500,top=0");
+
+                              window.open("json.php?objetojson=" + data["objeto"]["dummynombre_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
                               window.top.location.reload();
                          }else{
                               alert("Se ha producido un error.");
@@ -249,9 +285,7 @@ var mainController = function($rootScope, $scope, $http) {
                nombre: skin,
                accion: "set"
           })
-          .success(function(data, status, headers, config){
-               alert("Se ha cargado el SKIN: " + skin);                    
-
+          .success(function(data, status, headers, config){      
                $scope.$emit("request:setvaluespresaved");
                $scope.Mcolorama = data;
                $rootScope.rootImg = $scope.Mcolorama.dummyimg_backgroundimage;
