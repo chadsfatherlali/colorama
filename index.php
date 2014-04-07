@@ -106,7 +106,7 @@ $allskins = $s3h->get_all_files_json();
           <select ng-model="cartaPago" ng-change="setCartaPago()" ng-options="p.nombre for p in cartasPago"></select>
           
           <h4>Todos los skins disponibles</h4>
-          <select chosen ng-model="skin.all" ng-change="setSkin(skin.all)" ng-options="s for s in AllSkins">
+          <select chosen data-placeholder="Escoge un Portal" ng-model="skin.all" ng-change="setSkin(skin.all)" ng-options="s for s in AllSkins">
                <!-- <option ng-repeat="Skin in AllSkins">{{Skin}}</option> -->
                <option value=""></option>
           </select>
