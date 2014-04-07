@@ -15,7 +15,7 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
           
           header("Content-Description: File Transfer"); 
           header("Content-Type: application/octet-stream");
-          header("Content-disposition: attachment; filename='" . $datosNombre["dummylayer_null"] . ".js'");  
+          header("Content-disposition: attachment; filename='" . (int)$datosNombre["dummylayer_null"] . ".js'");
      }
 
      echo $datos;
@@ -25,9 +25,10 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
      $datos = file_get_contents("php://input");
      $get = json_decode($datos, true);
 
-     if(isset($get["accion"]) && $get["accion"] == "set"){
-
-          $datos = file_get_contents("https://b2c-docs.s3.amazonaws.com/colorama_landings/" . $get["nombre"]);
+     if(isset($get["accion"]) && $get["accion"] == "set") {
+          
+          $skin = str_replace(" - ", "/", $get["nombre"]);
+          $datos = file_get_contents("https://b2c-docs.s3.amazonaws.com/colorama_landings/" . $skin);
           echo $datos;
 
      }else if(isset($get["accion"]) && $get["accion"] == "comprobar") { 
@@ -35,8 +36,16 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
           $result = $s3h->get_files_json($get["portal_id"]);
           echo json_encode($result);
 
-     }else{
+     }else if(isset($get["accion"]) && $get["accion"] == "interactivas") {
+          $pais = (isset($get["pais"]))
+          ? $get["pais"]
+          : "espana";
 
+          $result = $s3h->get_interactive_headers($pais);
+          echo json_encode($result);
+
+     }else{
+          
           $result = $s3h->upload_generate_json($datos);
 
           if($result["success"]){

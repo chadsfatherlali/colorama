@@ -9,11 +9,40 @@
      var _alfanumericos_ = /^([A-Za-z0-9\_]{3,})+$/;
      var _hexadecimal_ = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;          
      var _base64_ = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
-     var _colorama_ = angular.module("App", ["colorpicker.module"]);
-
+     var _colorama_ = angular.module("App", ["colorpicker.module", "ngRoute", "ngSanitize", "localytics.directives"]);
      
+
      /**
-      * [description]
+      * [Estable los dummys para la aplicación]
+      * @param  {[objeto]} $routeProvider [objeto con todas las rutas]
+      * @return {[html]}                [devuelve la vista y el controlador a cargar]
+      */
+     _colorama_.config(["$routeProvider", function($routeProvider) {
+          $routeProvider
+          .when("/:pais",
+               {
+                    templateUrl: function($routeParams) {
+                         return "ngviews/" + $routeParams.pais + ".html";
+                    },
+                    // controller: "getInteractives"
+               }
+          )
+          // .when("/interactivas", 
+          //      {
+          //           templateUrl: "ngviews/interactivas.html"
+          //      }
+          // )         
+          .otherwise(
+               {
+                    templateUrl: "ngviews/espana.html",
+                    // controller: "getInteractives"
+               }
+          );
+     }]);
+
+   
+     /**
+      * [Setea la variable rootImg en el entorno del Colorama]
       * @param  {[objeto]} $rootScope [contiene todo el entorno de angularjs]
       * @return {[objeto]}            [devuelve la informacion del objeto "imagen en base64"]
       */
@@ -21,7 +50,7 @@
           var imagenInfo = {};
 
           imagenInfo.pasar = function(info) {
-               $rootScope.rootImg = info;                    
+               $rootScope.rootImg = info;
           }
           
           return imagenInfo;
@@ -35,6 +64,7 @@
      _colorama_.directive("hexadecimal", function() {
           return {
                require: "ngModel",
+
                link: function(scope, elm, attrs, ctrl) {
                     ctrl.$parsers.unshift(function(viewValue) {
                          if (_hexadecimal_.test(viewValue)) {
@@ -61,6 +91,7 @@
      _colorama_.directive("numerico", function() {
           return {
                require: "ngModel",
+
                link: function(scope, elm, attrs, ctrl) {
                     ctrl.$parsers.unshift(function(viewValue) {
                          if (_numerico_.test(viewValue)) {
@@ -87,6 +118,7 @@
      _colorama_.directive("alfanumericos", function() {
           return {
                require: "ngModel",
+
                link: function(scope, elm, attrs, ctrl) {
                     ctrl.$parsers.unshift(function(viewValue) {
                          if (_alfanumericos_.test(viewValue)) {
@@ -115,6 +147,7 @@
           return {
                restrict: "AE",
                scope: {},
+
                link: function(scope, element, attrs) {
                     var esValida;
                     var procesarDD;
@@ -123,7 +156,8 @@
                     
                     procesarDD = function(e){
                          e.preventDefault();
-                         e.dataTransfer.effectAllowed = "copy";
+                         // e.dataTransfer.effectAllowed = "copy";
+                         e.originalEvent.dataTransfer.effectAllowed = "copy";
 
                          return false;
                     }
@@ -147,6 +181,7 @@
                          var lector;
                          var tamano
                          var tipo;
+                         var info;
                          
                          e.preventDefault();
 
@@ -162,13 +197,13 @@
                               }
                          };
 
-                         archivo = e.dataTransfer.files[0];
+                         //archivo = e.dataTransfer.files[0];
+                         archivo = e.originalEvent.dataTransfer.files[0];
+                         // document.getElementById("uploadfile").value = archivo;
                          nombre = archivo.name;
                          tipo = archivo.type;
                          tamano = archivo.size;
                          lector.readAsDataURL(archivo);
-
-                         return false;
                     });
                }
           };
@@ -180,20 +215,88 @@
  * [mainController controlador general de la aplicación]
  * @return {[null]} 
  */
-var mainController = function($rootScope, $scope, $window, $http) {
-     $scope.Skins = {};
+var mainController = function($rootScope, $scope, $window, $http, $routeParams, $location, $sce, $compile) {
+     $scope.urlIframe = null;
+     $scope.pais = "espana";
+     $scope.Skins = {};     
      $scope.listo = false;
-     $scope.Mcolorama = {};          
+     $scope.Mcolorama = {};     
      $scope.envioDatos = true;
+     // $scope.Interactives = {};
      $rootScope.rootImg = null;
      $rootScope.rootListImage = [];
      $scope.Portales = $window.Portales;
      $scope.AllSkins = $window.AllSkins["objetos"];
+     // $scope.Mcolorama.dummyinteractive_name = "";
+     $scope.tiposImagen = [
+          {
+               nombre: "Estática",
+               tipo: "estatica"
+          },
+          {    
+               nombre: "Dinámica",
+               tipo: "dinamica"
+          }
+     ];
+     $scope.cartasPago = [
+          {
+               nombre: "España",
+               vista: "espana"
+          },
+          {
+               nombre: "Italia",
+               vista: "italia"
+          }
+     ];
+
+     $scope.tipoImagen = $scope.tiposImagen[0];
+     $scope.cartaPago = $scope.cartasPago[0];
 
      $rootScope.$watch(function() {
           $scope.Mcolorama.dummyimg_backgroundimage = $rootScope.rootImg;
      });
 
+     // $scope.$watch("Mcolorama.dummyimg_backgroundimage", function() {
+     //      if($scope.pais == "espana") {
+     //           $scope.Mcolorama.dummyinteractive_name = null;
+     //      }
+     // });
+
+     // $scope.$watch("Mcolorama.dummyinteractive_name", function() {
+     //      if($scope.pais == "espana") {
+     //           $scope.Mcolorama.dummyimg_backgroundimage = null;
+     //      }
+     // });
+
+
+     /**
+      * [getInteractives Obtiene todos las creatividades HTML por defecto y si es que las hay carga las de ESPAÑA]
+      * @param  {[objeto]} $routeParams [objeto con toda la config de para establecer la URL]
+      * @return {[array]}              [array con todas las creatividades interactivas]
+      */
+     // $scope.getInteractives = function($routeParams) {          
+     //      $http.post("json.php", {
+     //           pais: $routeParams.pais,
+     //           accion: "interactivas"
+     //      })
+     //      .success(function(data, status, headers, config){
+     //           if(data.success){
+     //                $scope.Interactives = data.htmls;
+     //           }
+     //      })
+     //      .error(function(data, status, headers, config){
+     //           console.log("ERROR:", data);
+     //      });
+     // }
+
+
+     /**
+      * [setCartaPago establece la url de la vista a cargar y su respectivo controlador]
+      */
+     $scope.setCartaPago = function() {
+          $scope.pais = $scope.cartaPago.vista;
+          $location.path($scope.cartaPago.vista);
+     }
 
      /**
       * [formularioColorama Recoje todos los colores del formulario para aplicarlos al colorama]
@@ -237,21 +340,21 @@ var mainController = function($rootScope, $scope, $window, $http) {
                && $scope.formColorama.dummyboton_backgroundcolor.$dirty
                && $scope.formColorama.dummytextoboton_color.$dirty
                && $scope.formColorama.dummytexto_color.$dirty
-               && $scope.formColorama.dummynombre_null.$dirty){
+               && $scope.formColorama.dummynombre_null.$dirty) {
 
                     $http.post("json.php", Mcolorama)
                     .success(function(data, status, headers, config){
                          if(data["success"]){
                               var texto = (data["objeto"]["dummylayer_null"])
-                              ? "Se ha creado el SKIN correntamente: " + data["objeto"]["dummynombre_null"] + "\ny el LAYER: " + data["objeto"]["dummylayer_null"]
-                              : "Se ha creado el SKIN correntamente: " + data["objeto"]["dummynombre_null"];
+                              ? "Se ha creado el SKIN correctamente: " + data["objeto"]["dummynombre_null"] + "\ny el LAYER: " + data["objeto"]["dummylayer_null"]
+                              : "Se ha creado el SKIN correctamente: " + data["objeto"]["dummynombre_null"];
 
                               alert(texto);
                               
                               if(data["objeto"]["dummylayer_null"]) window.open("json.php?objetojson=" + data["objeto"]["dummylayer_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=2", "_blank", "width=500,height=10,left=500,top=0");
 
                               window.open("json.php?objetojson=" + data["objeto"]["dummynombre_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
-                              window.top.location.reload();
+                              //window.top.location.reload();
                          }else{
                               alert("Se ha producido un error.");
                               $scope.envioDatos = true;
@@ -300,18 +403,31 @@ var mainController = function($rootScope, $scope, $window, $http) {
 
 
      /**
+      * [setInteractive establece la url de la creativiad interactiva en el Dummy]
+      * @param {[type]} skin [nombre de la creatividad]
+      */
+     // $scope.setInteractive = function(skin) {
+     //      $location.path("interactivas");
+     //      $scope.urlIframe = "interactivas/" + $scope.pais + "/" + skin;
+     //      $scope.Mcolorama.dummyinteractive_name = skin;
+          
+     //      if($scope.pais == "espana") {
+     //           $scope.Mcolorama.dummyimg_backgroundimage = "Santiago";
+     //      }
+     // }
+
+
+     /**
       * [checkPortal chequea el portal si existe el portal y regresa los skins, caso contrario lo crea para poder almacenar los skins]
       * @param  {[string]} id [id del portal selecto]
       */
-     $scope.checkPortal = function(id) {
+     $scope.checkPortal = function(portal) {
           $scope.listo = true;
-          var portal_id = id.split(" -- ");
-          portal_id = portal_id[1];
 
-          $scope.Mcolorama.dummy_portal = portal_id;              
+          $scope.Mcolorama.dummy_portal = portal.w_id;
 
           $http.post("json.php", {
-               portal_id: portal_id,
+               portal_id: portal.w_id,
                accion: "comprobar"
           })
           .success(function(data, status, headers, config){
@@ -320,6 +436,7 @@ var mainController = function($rootScope, $scope, $window, $http) {
                     $scope.Skins = data["objetos"];
                }else{
                     alert("No existe el bucket (No tiene skins asociados...)");
+                    $scope.Skins = {};
                }
 
                $scope.listo = false;
@@ -328,4 +445,4 @@ var mainController = function($rootScope, $scope, $window, $http) {
                console.log("ERROR:", data);
           });
      }
-}
+};

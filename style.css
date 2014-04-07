@@ -10,8 +10,12 @@ body{
      float: left;
      margin-bottom: 50px;
 }
+.modulos h4{
+     text-align: center;
+     font-size: 1em;
+}
 #modulo-dummy{
-     width: 22%;
+     width: 24%;
      margin-left: 50px;
      border-right: 1px dotted grey;
      padding-right: 3em;
@@ -42,12 +46,13 @@ body{
      overflow: auto;
 }
 #dummy{
+     margin-top: 1em;
      width: 350px;
      height: 600px;
      border: 1px dotted black;
-     -webkit-border-radius: 50px;
-     -moz-border-radius: 50px;
-     border-radius: 50px;
+     -webkit-border-radius: 10px;
+     -moz-border-radius: 10px;
+     border-radius: 10px;
 }
 #dummyheader{
      background-repeat: no-repeat;
@@ -56,12 +61,12 @@ body{
      height: 250px;
      background-size: cover;
      border-bottom: 1px dotted grey;
-     -webkit-border-top-left-radius: 50px;
-     -webkit-border-top-right-radius: 50px;
-     -moz-border-radius-topleft: 50px;
-     -moz-border-radius-topright: 50px;
-     border-top-left-radius: 50px;
-     border-top-right-radius: 50px;
+     -webkit-border-top-left-radius: 10px;
+     -webkit-border-top-right-radius: 10px;
+     -moz-border-radius-topleft: 10px;
+     -moz-border-radius-topright: 10px;
+     border-top-left-radius: 10px;
+     border-top-right-radius: 10px;
 }
 #dummyboton{
      width: 80%;
@@ -120,6 +125,39 @@ fieldset .replica strong{
      margin-top: 50px;
 }
 
+div.contenedor-transparencia-iframe{
+     display: inline-block;
+     border: 1px solid black;
+     border-top: none;
+     width: 30%;
+     height: 30px;
+     position: relative;
+}
+
+div.contenedor-transparencia-iframe div.elemento-draggable{
+     width: 30px;
+     height: 30px;
+     background: #7d7e7d; /* Old browsers */
+     background: -moz-linear-gradient(top,  #7d7e7d 0%, #0e0e0e 100%); /* FF3.6+ */
+     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7d7e7d), color-stop(100%,#0e0e0e)); /* Chrome,Safari4+ */
+     background: -webkit-linear-gradient(top,  #7d7e7d 0%,#0e0e0e 100%); /* Chrome10+,Safari5.1+ */
+     background: -o-linear-gradient(top,  #7d7e7d 0%,#0e0e0e 100%); /* Opera 11.10+ */
+     background: -ms-linear-gradient(top,  #7d7e7d 0%,#0e0e0e 100%); /* IE10+ */
+     background: linear-gradient(to bottom,  #7d7e7d 0%,#0e0e0e 100%); /* W3C */
+     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7d7e7d', endColorstr='#0e0e0e',GradientType=0 ); /* IE6-9 */
+}
+
+/**
+ * CSS CHOSEN
+ */
+
+#skinsSelect_chosen{
+     width: 500px !important;
+}
+
+#tipoSkin_chosen{
+     width: 200px !important;
+}
 /**
  * CSS LOADER
  */
@@ -242,4 +280,43 @@ div#loader{
      height: 20px;
      -webkit-animation-delay: 0.1s;
      animation-delay: 0.1s;
+}
+
+
+/*===================================
+= ITALIA ============================
+===================================*/
+
+#dummy.it{
+     background-size: cover;
+     background-position: center 0;
+}
+#dummy.it #dummyheader{
+     height: 450px;
+}
+#dummy.it #dummyboton{
+     height: 40px;
+     -webkit-border-radius: 10px;
+     -moz-border-radius: 10px;
+     border-radius: 10px;
+     margin-top: 0px;
+     line-height: 35px;
+     font-size: 2em;
+     background: white !important;
+}
+#dummy.it #dummytextoboton{
+     color: black !important;
+}
+#dummy.it #dummytexto{
+     margin-top: 5px;
+     color: black !important;
+}
+
+
+/*===================================
+= INTERACTIVO =======================
+===================================*/
+
+#dummy.interactiva #dummyheader{
+     height: 300px;
 }

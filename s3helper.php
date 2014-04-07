@@ -1,6 +1,7 @@
 <?
 include "aws-sdk-for-php-master/sdk.class.php";
 include "aws-sdk-for-php-master/services/s3.class.php";
+include("lib/dev_prod_config.php");
 include_once "lib/dbmgr.php";
 include_once "lib/resource.php";
 
@@ -33,11 +34,12 @@ class s3helper extends AmazonS3{
                "pcre" => "/colorama_landings/"
           ));
 
-           if(!empty($archivos)){
+          if(!empty($archivos)){
                $coincidencias = preg_grep($patron, $archivos);
 
                foreach ($coincidencias as $value) {
                     list($basura, $archivo) = explode("colorama_landings/", $value);
+                    $archivo = str_replace("/", " - ", $archivo);
 
                     $response["objetos"][] = $archivo;
                }
@@ -71,6 +73,7 @@ class s3helper extends AmazonS3{
 
                foreach ($coincidencias as $value) {
                     list($basura, $archivo) = explode("colorama_landings/", $value);
+                    $archivo = str_replace("/", " - ", $archivo);
 
                     $response["objetos"][] = $archivo;
                }
@@ -106,9 +109,8 @@ class s3helper extends AmazonS3{
           $replica = null;
           $datos = json_decode($datos, true);
           $carpeta = "colorama_landings/" . $datos["dummy_portal"] . "/";
-
-          if(isset($datos["dummylayer_null"]) 
-          && !empty($datos["dummylayer_null"])) {
+          
+          if(isset($datos["dummylayer_null"])) {
                $replica = $datos["dummylayer_null"] . "===" . $datos["dummynombre_null"];
                $datos["replica"] = $replica;
 
@@ -117,8 +119,8 @@ class s3helper extends AmazonS3{
                     "acl"                    => AmazonS3::ACL_PUBLIC,
                     "contentType"            => "application/javascript",
                     "headers"                => array(
-                       "Content-Encoding"    => "UTF-8",
-                       "Cache-Control"    => "max-age=60",
+                         "Content-Encoding"  => "UTF-8",
+                         "Cache-Control"     => "max-age=60",
                     ),
                ));
           }
@@ -128,8 +130,8 @@ class s3helper extends AmazonS3{
                "acl"                    => AmazonS3::ACL_PUBLIC,
                "contentType"            => "application/javascript",
                "headers"                => array(
-                  "Content-Encoding"    => "UTF-8",
-                  "Cache-Control"    => "max-age=60",
+                    "Content-Encoding"  => "UTF-8",
+                    "Cache-Control"     => "max-age=60",
                ),
           ));
 
@@ -140,7 +142,7 @@ class s3helper extends AmazonS3{
                $response["success"] = false;
           }
           
-          return $response;
+          return $response; 
      }
 
      /**
@@ -163,7 +165,7 @@ class s3helper extends AmazonS3{
           ORDER BY w_ts_modificacion DESC";
 
           $portales = db::query("argo", $sql, array());
-          
+
           foreach ($portales as $value) {
                if($value["w_product_tag"] == "PORTALES_MOBILE") {
                     $portales_mobile[] = $value;
@@ -171,7 +173,28 @@ class s3helper extends AmazonS3{
           }
 
           return $portales_mobile;
-     }     
+     }
+
+
+     public function get_interactive_headers($pais) {
+          $interactivas = array();
+          $directorio = "interactivas/" . $pais . "/";
+
+          if(@$gestor = opendir($directorio)) {
+               while(false !== ($entrada = readdir($gestor))) {
+                    if($entrada != "." && $entrada != ".." && strpos($entrada, "._") === false) {
+                         $interactivas["htmls"][] = $entrada;
+                    }
+               }
+         
+               closedir($gestor);
+               $interactivas["success"] = true;
+          }else{
+               $interactivas["success"] = false;
+          }
+
+          return $interactivas;
+     }
 }
 
 $s3h = new s3helper();

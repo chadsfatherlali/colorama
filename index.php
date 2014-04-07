@@ -1,21 +1,30 @@
 <? 
 include "s3helper.php";
+
 $portales = $s3h->get_mobile_web_sites();
 $allskins = $s3h->get_all_files_json();
 ?>
 <!doctype html>
 <html lang="es" ng-app="App">
 <head>
+     <base href="index.php" />
      <meta charset="UTF-8">
      <title>Colorama Landings</title>
      <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
      <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-theme.min.css">
+     <link rel="stylesheet" type="text/css" href="vendor/chosen.css">
+     <link rel="stylesheet" type="text/css" href="chosen-spinner.css">
      <link href="colorpicker.css" rel="stylesheet">
      <link href="style.css" rel="stylesheet">
-     
+
+     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>     
      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
      <script type="text/javascript" src="http://code.angularjs.org/1.2.7/angular-route.min.js"></script>
+     <script type="text/javascript" src="http://code.angularjs.org/1.2.15/angular-sanitize.min.js"></script>     
+     <script type="text/javascript" src="vendor/chosen.jquery.js"></script>
+     <script type="text/javascript" src="chosen.js"></script>     
      <script type="text/javascript" src="bootstrap-colorpicker-module.js"></script>
+     
      <script>
           window.Portales = <? echo json_encode($portales) ?>;
           window.AllSkins = <? echo json_encode($allskins) ?>;
@@ -25,29 +34,32 @@ $allskins = $s3h->get_all_files_json();
      <div id="loader" ng-if="listo">
           <div class="content-loader">
                <div class='loading spin-1'>
-                 <div class='loading spin-2'>
-                   <div class='loading spin-3'>
-                     <div class='loading spin-4'>
-                       <div class='loading spin-5'>
-                         <div class='loading spin-6'></div>
-                       </div>
-                     </div>
-                   </div>
-                 </div>
+                    <div class='loading spin-2'>
+                         <div class='loading spin-3'>
+                              <div class='loading spin-4'>
+                                   <div class='loading spin-5'>
+                                        <div class='loading spin-6'></div>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
                </div>
           </div>
      </div>
-
-     <h1>COLORAMA LANDINGS</h1>
+     
      <fieldset>
           <legend>Portales disponibles:</legend>
-          <select id="portalSelect" ng-model="portal.id" ng-change="checkPortal(portal.id)">
-               <option ng-repeat="Portal in Portales">{{Portal.w_alias}} -- {{Portal.w_id}}</option>
+          <select chosen data-placeholder="Escoge un Portal" id="portalSelect" ng-model="portal" ng-change="checkPortal(portal)" ng-options="(p.w_alias + ' -- ' + p.w_id) for p in Portales">
+               <option value=""></option>
           </select>
           <legend>Skins disponibles:</legend>
-          <select id="skinsSelect" ng-model="skin.name" ng-change="setSkin(skin.name)">
-               <option ng-repeat="Skin in Skins">{{Skin}}</option>
+          <h3>Imagenes:</h3>
+          <select chosen data-placeholder="Escoge un Skin" id="skinsSelect" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in Skins">
+               <option value=""></option>
+               <!-- <option ng-repeat="Skin in Skins">{{Skin}}</option> -->
           </select>
+          <h3>Tipo:</h3>
+          <select id="tipoSkin" ng-model="tipoImagen" ng-options="p.nombre for p in tiposImagen"></select>          
           <span class="replica" ng-if="Mcolorama.replica"><strong>REPLICA:</strong> {{Mcolorama.replica}}</span>
      </fieldset>
      <div>
@@ -70,8 +82,14 @@ $allskins = $s3h->get_all_files_json();
                </fieldset>
                <fieldset>
                     <legend>Imagen Cabecera:</legend>
-                    <input name="dummyimg_backgroundimage" id="dummyinputimg" ng-model="Mcolorama.dummyimg_backgroundimage" class="dropzone" placeholder="Suelta aquí la imagen" soltar-archivos="[image/png, image/jpeg, image/gif]" value=""></input>
+                    <input ng-if="tipoImagen.tipo == 'estatica'" name="dummyimg_backgroundimage" id="dummyinputimg" ng-model="Mcolorama.dummyimg_backgroundimage" class="dropzone" placeholder="Suelta aquí la imagen" soltar-archivos="[image/png, image/jpeg, image/gif]" value=""></input>
+                    <input ng-if="tipoImagen.tipo == 'dinamica'" type="file" name="dummyimg_backgroundimage" id="dummyinputimg" value="Mcolorama.dummyimg_backgroundimage" />
                </fieldset>
+             <!--   <fieldset>
+                    <legend>Tranparencia del iframe (solo cartas de pago Italia):</legend>
+                    <p>{{Mcolorama.dummyiframe_background}}%</p>
+                    <input name="dummyiframe_background" id="dummyinputiframe" ng-model="Mcolorama.dummyiframe_background" type="range" min="0" max="100" step="0" />
+               </fieldset> -->
                <fieldset>
                     <legend>Nombre del SKIN:</legend>
                     <input name="dummynombre_null" id="dummyinputnombre" ng-model="Mcolorama.dummynombre_null" type="text" alfanumericos placeholder="Nombre del SKIN" value="" />
@@ -82,20 +100,18 @@ $allskins = $s3h->get_all_files_json();
                </fieldset>
                <button id="generar-y-guardar" ng-click="gd(Mcolorama)" ng-if="envioDatos">Generar y Descargar</button>
           </form>
-     </div>
-     
-     <div class="modulos" id="modulo-dummy">
-          <div id="dummy" style="background-color: {{Mcolorama.dummy_backgroundcolor}}">
-               <div id="dummyheader" style="background-image: url({{rootImg}})"></div>
-               <div id="dummybody">
-                    <div id="dummyboton" style="background-color: {{Mcolorama.dummyboton_backgroundcolor}}"><span id="dummytextoboton" style="color: {{Mcolorama.dummytextoboton_color}}">Acceder</span></div>
-                    <div id="dummytexto" style="color: {{Mcolorama.dummytexto_color}}">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sed augue congue, varius metus nec, sodales velit. Aenean ut porttitor dolor. Vestibulum fringilla ut est non commodo. Phasellus iaculis pharetra vestibulum. Sed porttitor lorem in nisl bibendum, vel ultrices lectus sagittis.</div>
-               </div>
-          </div>
-          <h3>Todos los skins disponibles</h3>
-          <select ng-model="skin.all" ng-change="setSkin(skin.all)">
-               <option ng-repeat="Skin in AllSkins">{{Skin}}</option>
+     </div>     
+
+     <div class="modulos" id="modulo-dummy">          
+          <select ng-model="cartaPago" ng-change="setCartaPago()" ng-options="p.nombre for p in cartasPago"></select>
+          
+          <h4>Todos los skins disponibles</h4>
+          <select chosen ng-model="skin.all" ng-change="setSkin(skin.all)" ng-options="s for s in AllSkins">
+               <!-- <option ng-repeat="Skin in AllSkins">{{Skin}}</option> -->
+               <option value=""></option>
           </select>
+
+          <div ng-view></div>
      </div>
 
      <div class="modulos" id="modulo-json">
