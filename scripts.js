@@ -2,14 +2,19 @@
  * [_colorama_ Variable que contiene la inicialización de la aplicación]
  * @type {[objeto]}
  */
-(function(){
+(function() {
      var ok = "#f2ffff";
      var ko = "#ffe3e3";
      var _numerico_ = /^[0-9]+$/;
      var _alfanumericos_ = /^([A-Za-z0-9\_]{3,})+$/;
      var _hexadecimal_ = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;          
      var _base64_ = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
-     var _colorama_ = angular.module("App", ["colorpicker.module", "ngRoute", "ngSanitize", "localytics.directives"]);
+     var _colorama_ = angular.module("App", [
+          "colorpicker.module", 
+          "ngRoute", 
+          "ngSanitize", 
+          "localytics.directives"
+     ]);
      
 
      /**
@@ -23,19 +28,12 @@
                {
                     templateUrl: function($routeParams) {
                          return "ngviews/" + $routeParams.pais + ".html";
-                    },
-                    // controller: "getInteractives"
+                    }
                }
-          )
-          // .when("/interactivas", 
-          //      {
-          //           templateUrl: "ngviews/interactivas.html"
-          //      }
-          // )         
+          )        
           .otherwise(
                {
                     templateUrl: "ngviews/espana.html",
-                    // controller: "getInteractives"
                }
           );
      }]);
@@ -139,6 +137,26 @@
 
 
      /**
+      * [Directiva para entireactuar con el alert de confirm para borrar una landing]
+      * @return {[null]}
+      */
+     _colorama_.directive("ngConfirmClick", function() {
+          return {
+               link: function (scope, element, attr) {
+                    var msg = "Estas seguro de borrar el skin: " + scope.Mcolorama.dummynombre_null + "?";
+                    var clickAction = attr.confirmedClick;
+                    
+                    element.bind("click",function (event) {
+                         if(window.confirm(msg)) {
+                              scope.$eval(clickAction);
+                         }
+                    });
+               }
+          };
+     });
+
+
+     /**
       * [Drag and drop de archivos de tipo imagen que serán codificado en base64]
       * @param  {[objeto]} enviarImg [con la informacion del de la imagen en base64]
       * @return {[string]}           [string de la imgen en base64]
@@ -154,7 +172,7 @@
                     var TMPlistado = new Array();
                     var extesionesValidas = attrs.soltarArchivos;
                     
-                    procesarDD = function(e){
+                    procesarDD = function(e) {
                          e.preventDefault();
                          // e.dataTransfer.effectAllowed = "copy";
                          e.originalEvent.dataTransfer.effectAllowed = "copy";
@@ -165,7 +183,7 @@
                     esValida = function(extesiones) {
                          if(extesionesValidas.indexOf(extesiones) > -1) {
                               return true;
-                         }else{
+                         } else {
                               alert("Tipo de archivo incorrecto son solo válidos los siguientes:" + extesionesValidas);
                               
                               return false;
@@ -187,19 +205,17 @@
 
                          lector = new FileReader();
                          lector.onload = function(evt) {
-                              if(esValida(tipo)){
+                              if(esValida(tipo)) {
                                    return scope.$apply(function() {
                                         scope.archivo = evt.target.result;
                                         TMPlistado[0] = (evt.target.result);
                                         scope.listado = TMPlistado;
-                                        enviarImg.pasar(scope.archivo);
+                                        enviarImg.pasar(scope.archivo, nombre);
                                    });
                               }
                          };
 
-                         //archivo = e.dataTransfer.files[0];
                          archivo = e.originalEvent.dataTransfer.files[0];
-                         // document.getElementById("uploadfile").value = archivo;
                          nombre = archivo.name;
                          tipo = archivo.type;
                          tamano = archivo.size;
@@ -216,28 +232,20 @@
  * @return {[null]} 
  */
 var mainController = function($rootScope, $scope, $window, $http, $routeParams, $location, $sce, $compile) {
-     $scope.urlIframe = null;
+     $scope.permitidoBorrar = false;
+     $scope.menudesplegado = false;
      $scope.pais = "espana";
-     $scope.Skins = {};     
-     $scope.listo = false;
-     $scope.Mcolorama = {};     
+     $scope.Skins = [];
+     $rootScope.listo = false;
+     $scope.Mcolorama = {};
+     $scope.portalDuplicar = {};
+     $scope.portalBorrar = {};
      $scope.envioDatos = true;
-     // $scope.Interactives = {};
      $rootScope.rootImg = null;
-     $rootScope.rootListImage = [];
      $scope.Portales = $window.Portales;
      $scope.AllSkins = $window.AllSkins["objetos"];
-     // $scope.Mcolorama.dummyinteractive_name = "";
-     $scope.tiposImagen = [
-          {
-               nombre: "Estática",
-               tipo: "estatica"
-          },
-          {    
-               nombre: "Dinámica",
-               tipo: "dinamica"
-          }
-     ];
+     $scope.BucketLlenos = $window.BucketsConContenido["full"];
+     $scope.BucketVacios = $window.BucketsConContenido["empty"];     
      $scope.cartasPago = [
           {
                nombre: "España",
@@ -249,45 +257,82 @@ var mainController = function($rootScope, $scope, $window, $http, $routeParams, 
           }
      ];
 
-     $scope.tipoImagen = $scope.tiposImagen[0];
      $scope.cartaPago = $scope.cartasPago[0];
 
      $rootScope.$watch(function() {
+          $scope.Mcolorama.dummyimg_backgroundimageanimated = $rootScope.rootName;
           $scope.Mcolorama.dummyimg_backgroundimage = $rootScope.rootImg;
      });
+  
 
-     // $scope.$watch("Mcolorama.dummyimg_backgroundimage", function() {
-     //      if($scope.pais == "espana") {
-     //           $scope.Mcolorama.dummyinteractive_name = null;
-     //      }
-     // });
+     /**
+      * [borrarSkin Función que nos permite borrar Skins que no se necesite]
+      * @return {[null]}
+      */
+     $scope.borrarSkin = function() {
+          $rootScope.listo = true;
 
-     // $scope.$watch("Mcolorama.dummyinteractive_name", function() {
-     //      if($scope.pais == "espana") {
-     //           $scope.Mcolorama.dummyimg_backgroundimage = null;
-     //      }
-     // });
+          $http.post("json.php", {
+               portal_id: $scope.Mcolorama.dummy_portal,
+               skin_name: $scope.Mcolorama.dummynombre_null,
+               accion: "borrar"
+          })
+          .success(function(data, status, headers, config) {
+               if(data) {
+                    alert("Se ha borrado el SKIN: " + $scope.Mcolorama.dummynombre_null);
+
+                    angular.forEach($scope.Skins, function(value, key) {
+                         if(value == $scope.Mcolorama.dummy_portal + " - " + $scope.Mcolorama.dummynombre_null + ".js") {
+                              console.log(key);
+                              $scope.Skins.splice(key, 1);
+                         }
+                    });
+
+                    angular.forEach($scope.AllSkins, function(value, key) {
+                         if(value == $scope.Mcolorama.dummy_portal + " - " + $scope.Mcolorama.dummynombre_null + ".js") {
+                              console.log(key);
+                              $scope.AllSkins.splice(key, 1);
+                         }
+                    });
+                   
+                    $scope.Mcolorama = {};
+                    $scope.Mcolorama.dummyimg_backgroundimage = "";
+                    $rootScope.rootImg = "";
+
+                    $rootScope.listo = false;
+                    $scope.permitidoBorrar = false;
+               }
+          })
+          .error(function(data, status, headers, config) {
+               $scope.permitidoBorrar = false;
+               try{console.log("ERROR:", data)}catch(err) {};
+          });
+     }
 
 
      /**
-      * [getInteractives Obtiene todos las creatividades HTML por defecto y si es que las hay carga las de ESPAÑA]
-      * @param  {[objeto]} $routeParams [objeto con toda la config de para establecer la URL]
-      * @return {[array]}              [array con todas las creatividades interactivas]
+      * [getIMG Función que nos abre en una ventana nueva la IMAGEN actualmente usada en la configuración del colorama]
+      * @return {[null]}
       */
-     // $scope.getInteractives = function($routeParams) {          
-     //      $http.post("json.php", {
-     //           pais: $routeParams.pais,
-     //           accion: "interactivas"
-     //      })
-     //      .success(function(data, status, headers, config){
-     //           if(data.success){
-     //                $scope.Interactives = data.htmls;
-     //           }
-     //      })
-     //      .error(function(data, status, headers, config){
-     //           console.log("ERROR:", data);
-     //      });
-     // }
+     $scope.getIMG = function() {
+          window.open($scope.Mcolorama.dummyimg_backgroundimage, "_blank");
+     }
+
+
+     /**
+      * [desplegarmenu Funcion para desplegar el menu]
+      * @param  {[objeto]} $event [Objeto que lo emite]
+      * @return {[null]}
+      */
+     $scope.desplegarmenu = function($event) {
+          $scope.menudesplegado = ($scope.menudesplegado)? false : true;
+
+          var texto = ($scope.menudesplegado)
+          ? "=> CERRAR"
+          : "=> OPCIONES"
+
+          angular.element($event.target).html(texto);
+     }
 
 
      /**
@@ -298,6 +343,94 @@ var mainController = function($rootScope, $scope, $window, $http, $routeParams, 
           $location.path($scope.cartaPago.vista);
      }
 
+
+     /**
+      * [formularioS3clonar función para duplicar un bucket]
+      * @param  {[objeto]} $scope [contiene todas las variables de la applicación]
+      * @return {[objeto]}
+      */
+     $scope.formularioS3clonar = function($scope) {
+          $scope.duplicar = function(portalDuplicar) {
+               $rootScope.listo = true;
+
+               if($scope.formS3clonar.origen.$valid
+               && $scope.formS3clonar.destino.$valid
+               && $scope.formS3clonar.origen.$dirty
+               && $scope.formS3clonar.destino.$dirty) {
+
+                    var porigen = portalDuplicar.origen.split(" -- ");
+                    var pdestino = portalDuplicar.destino.split(" -- ");
+
+                    $http.post("json.php", {
+                         portal_origen: porigen[1],
+                         portal_destino: pdestino[1],
+                         accion: "duplicar"
+                    })
+                    .success(function(data, status, headers, config) {
+                         if(data["success"]) {
+                              window.top.location.reload();
+                              alert("El duplicado se se completo con éxito...");
+                         } else {
+                              $rootScope.listo = false;
+                              alert("Surgio un Error vuele a intentar más tarde...");
+                         }                         
+                    })
+                    .error(function(data, status, headers, config) {
+                         try{console.log("ERROR:", data)}catch(err) {};
+                         try{console.log("ERROR:", status)}catch(err) {};
+
+                         alert("Surgio un Error vuele a intentar más tarde...");
+                    });
+
+               } else {
+                    alert("Revisa tu bucket de Origen y tu bucket de Destino...");
+                    $rootScope.listo = false;
+               }
+          }
+     }
+
+
+     /**
+      * [formularioS3borrar Función para borrar un bucket complete]
+      * @param  {[type]} $scope [objeto que contiene todas las variables de la aplicación]
+      * @return {[objeto]}
+      */
+     $scope.formularioS3borrar = function($scope) {
+          $scope.borrar = function(portalBorrar) {
+               $rootScope.listo = true;
+
+               if($scope.formS3borrar.portalaborrar.$valid
+               && $scope.formS3borrar.portalaborrar.$dirty) {
+                    var pborrar = portalBorrar.portalaborrar.split(" -- ");
+
+                    $http.post("json.php", {
+                         portal_borrar: pborrar[1],
+                         accion: "borrarbucket"
+                    })
+                    .success(function(data, status, headers, config) {
+                         if(data["success"]) {
+                              window.top.location.reload();
+                              alert("Bucket borrado...");                    
+                         } else {
+                              $rootScope.listo = false;
+                              alert("Surgio un Error vuele a intentar más tarde...");
+                         }                         
+                    })
+                    .error(function(data, status, headers, config) {
+                         try{console.log("ERROR:", data)}catch(err) {};
+                         try{console.log("ERROR:", status)}catch(err) {};
+
+                         alert("Surgio un Error vuele a intentar más tarde...");
+                    });
+
+               } else {
+                    alert("Debes de escoger un bucket...");
+                    $rootScope.listo = false;
+               }
+          }
+     }
+
+
      /**
       * [formularioColorama Recoje todos los colores del formulario para aplicarlos al colorama]
       * @param  {[objeto]} $scope [el objeto que contiene el modelo de Mcolorama]
@@ -307,7 +440,7 @@ var mainController = function($rootScope, $scope, $window, $http, $routeParams, 
           $scope.imagen = null;               
           $scope.setValuesForm = false;
 
-          $rootScope.$on("request:setvaluespresaved", function(e){
+          $rootScope.$on("request:setvaluespresaved", function(e) {
                $scope.setValuesForm = true;
           });
          
@@ -318,10 +451,10 @@ var mainController = function($rootScope, $scope, $window, $http, $routeParams, 
            * @return {[null]}
            */          
           $scope.gd = function(Mcolorama) {
-               $scope.listo = true;
+               $rootScope.listo = true;
                $scope.envioDatos = false;
 
-               if($scope.setValuesForm){
+               if($scope.setValuesForm) {
                     $scope.formColorama.dummy_backgroundcolor.$setViewValue($scope.formColorama.dummy_backgroundcolor.$modelValue);
                     $scope.formColorama.dummyboton_backgroundcolor.$setViewValue($scope.formColorama.dummyboton_backgroundcolor.$modelValue);
                     $scope.formColorama.dummytextoboton_color.$setViewValue($scope.formColorama.dummytextoboton_color.$modelValue);
@@ -343,11 +476,18 @@ var mainController = function($rootScope, $scope, $window, $http, $routeParams, 
                && $scope.formColorama.dummynombre_null.$dirty) {
 
                     $http.post("json.php", Mcolorama)
-                    .success(function(data, status, headers, config){
-                         if(data["success"]){
+                    .success(function(data, status, headers, config) {
+                         if(data["success"]) {
+
+                              var nuevoSkin = data["objeto"]["dummy_portal"] + " - " + data["objeto"]["dummynombre_null"] + ".js";
                               var texto = (data["objeto"]["dummylayer_null"])
                               ? "Se ha creado el SKIN correctamente: " + data["objeto"]["dummynombre_null"] + "\ny el LAYER: " + data["objeto"]["dummylayer_null"]
                               : "Se ha creado el SKIN correctamente: " + data["objeto"]["dummynombre_null"];
+
+                              if($scope.Skins.indexOf(nuevoSkin) == -1) {
+                                   $scope.Skins.push(nuevoSkin);
+                                   $scope.AllSkins.push(nuevoSkin);
+                              }
 
                               alert(texto);
                               
@@ -355,23 +495,25 @@ var mainController = function($rootScope, $scope, $window, $http, $routeParams, 
 
                               window.open("json.php?objetojson=" + data["objeto"]["dummynombre_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
                               //window.top.location.reload();
-                         }else{
+                         } else {
                               alert("Se ha producido un error.");
                               $scope.envioDatos = true;
                          }
 
-                         $scope.listo = false;
+                         $scope.permitidoBorrar = true;
+                         $rootScope.listo = false;
                          $scope.envioDatos = true;
                     })
-                    .error(function(data, status, headers, config){
-                         try{console.log("ERROR1:", status)}catch(err){}
-                         try{console.log("ERROR2:", headers)}catch(err){}
+                    .error(function(data, status, headers, config) {
+                         $scope.permitidoBorrar = false;
+                         try{console.log("ERROR1:", status)}catch(err) {}
+                         try{console.log("ERROR2:", headers)}catch(err) {}
                     });
 
-               }else{
+               } else {
                     alert("Revisa el FORMULARIO");
                     $scope.envioDatos = true;
-                    $scope.listo = false;
+                    $rootScope.listo = false;
                }
           }
      }
@@ -382,47 +524,35 @@ var mainController = function($rootScope, $scope, $window, $http, $routeParams, 
       * @param {[objeto]} skin [todos los parametros del skin apra el dummy]
       */
      $scope.setSkin = function(skin) {
-          $scope.listo = true;
+          $rootScope.listo = true;
 
           $http.post("json.php", {
                nombre: skin,
                accion: "set"
           })
-          .success(function(data, status, headers, config){      
+          .success(function(data, status, headers, config) {
                $scope.$emit("request:setvaluespresaved");
                $scope.Mcolorama = data;
                $rootScope.rootImg = $scope.Mcolorama.dummyimg_backgroundimage;
 
-               $scope.listo = false;
+               $scope.permitidoBorrar = true;
+               $rootScope.listo = false;
           })
-          .error(function(data, status, headers, config){
-               try{console.log("ERROR1:", status)}catch(err){}
-               try{console.log("ERROR2:", headers)}catch(err){}
+          .error(function(data, status, headers, config) {
+               $scope.permitidoBorrar = false;
+
+               try{console.log("ERROR1:", status)}catch(err) {}
+               try{console.log("ERROR2:", headers)}catch(err) {}
           });
      }
 
-
-     /**
-      * [setInteractive establece la url de la creativiad interactiva en el Dummy]
-      * @param {[type]} skin [nombre de la creatividad]
-      */
-     // $scope.setInteractive = function(skin) {
-     //      $location.path("interactivas");
-     //      $scope.urlIframe = "interactivas/" + $scope.pais + "/" + skin;
-     //      $scope.Mcolorama.dummyinteractive_name = skin;
-          
-     //      if($scope.pais == "espana") {
-     //           $scope.Mcolorama.dummyimg_backgroundimage = "Santiago";
-     //      }
-     // }
-
-
+     
      /**
       * [checkPortal chequea el portal si existe el portal y regresa los skins, caso contrario lo crea para poder almacenar los skins]
       * @param  {[string]} id [id del portal selecto]
       */
      $scope.checkPortal = function(portal) {
-          $scope.listo = true;
+          $rootScope.listo = true;
 
           $scope.Mcolorama.dummy_portal = portal.w_id;
 
@@ -430,19 +560,23 @@ var mainController = function($rootScope, $scope, $window, $http, $routeParams, 
                portal_id: portal.w_id,
                accion: "comprobar"
           })
-          .success(function(data, status, headers, config){
-               if(data["success"]){
+          .success(function(data, status, headers, config) {
+               if(data["success"]) {
                     alert("Estan listos los SKIN solicitados");
+                    
                     $scope.Skins = data["objetos"];
-               }else{
+               } else {
                     alert("No existe el bucket (No tiene skins asociados...)");
-                    $scope.Skins = {};
+                    
+                    $scope.permitidoBorrar = false;
+                    $scope.Skins = [];
                }
 
-               $scope.listo = false;
+               $rootScope.listo = false;
           })
-          .error(function(data, status, headers, config){
-               console.log("ERROR:", data);
+          .error(function(data, status, headers, config) {
+               $scope.permitidoBorrar = false;
+               try{console.log("ERROR:", data)}catch(err) {};
           });
      }
 };

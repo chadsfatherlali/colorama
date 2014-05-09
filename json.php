@@ -36,16 +36,22 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
           $result = $s3h->get_files_json($get["portal_id"]);
           echo json_encode($result);
 
-     }else if(isset($get["accion"]) && $get["accion"] == "interactivas") {
-          $pais = (isset($get["pais"]))
-          ? $get["pais"]
-          : "espana";
-
-          $result = $s3h->get_interactive_headers($pais);
+     }else if(isset($get["accion"]) && $get["accion"] == "borrar") {
+          
+          $result = $s3h->delete_skin($get["portal_id"], $get["skin_name"]);
           echo json_encode($result);
 
+     }else if(isset($get["accion"]) && $get["accion"] == "duplicar") {
+
+          $result = $s3h->duplicate_buckets($get["portal_origen"], $get["portal_destino"]);
+          echo json_encode($result);
+
+     }else if(isset($get["accion"]) && $get["accion"] == "borrarbucket") {
+
+          $result = $s3h->delete_bucket_obj($get["portal_borrar"]);
+          echo json_encode($result);          
+
      }else{
-          
           $result = $s3h->upload_generate_json($datos);
 
           if($result["success"]){
