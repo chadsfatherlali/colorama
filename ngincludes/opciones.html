@@ -1,0 +1,26 @@
+<form name="formS3clonar" class="modulos" id="S3clonar" ng-controller="formularioS3clonar">
+     <fieldset>
+          <legend>Clonar Bucket:</legend>
+          <h3>Bucket Origen:</h3>
+          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge el bucket de origen" id="portalSelectOrigen" name="origen" ng-model="portalDuplicar.origen" ng-options="v as v for (k, v) in BucketLlenos">
+               <option value=""></option>
+          </select>
+          <h3>Bucket Destino:</h3>
+          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge el bucket de destino" id="portalSelectDestino" name="destino" ng-model="portalDuplicar.destino" ng-options="v as v for (k, v) in BucketVacios">
+               <option value=""></option>
+          </select>
+     </fieldset>
+     
+     <button id="duplicar-buckets" ng-click="duplicar(portalDuplicar)">Duplicar Bucket</button>
+</form>
+
+<form name="formS3borrar" class="modulos" id="S3borrar" ng-controller="formularioS3borrar">
+     <fieldset>
+          <legend>Borrar Bucket:</legend>
+          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge el bucket a borrar" id="portalSelectBorrar" name="portalaborrar" ng-model="portalBorrar.portalaborrar" ng-options="v as v for (k, v) in BucketLlenos">
+               <option value=""></option>
+          </select>
+     </fieldset>
+     
+     <button id="borrar-buckets" ng-click="borrar(portalBorrar)">Borrar Bucket</button>
+</form>
