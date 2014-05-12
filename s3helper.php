@@ -34,6 +34,38 @@ class s3helper extends AmazonS3 {
 
 
      /**
+      * [minifyHTML Función que comprime el HTML de la aplicación]
+      * @param  [string] $param [Parametro que decide el inicio o el fin de la compresión del documente HTML valores: "inicio" -> para comenzar la compresión y "fin" -> para terminar la compresion]
+      * @return [xhtml] [html comprimido]
+      */
+     public function minifyHTML($param) {
+          if($param == "inicio"){
+               function html($buffer) {
+                    $search = array(
+                         "/\>[^\S ]+/s",
+                         "/[^\S ]+\</s",
+                         "/(\s)+/s",
+                    );
+                     
+                    $replace = array(
+                         ">",
+                         "<",
+                         "\\1",
+                    );
+
+                    $buffer = preg_replace($search, $replace, $buffer);
+
+                    return ($buffer);
+               }
+
+               ob_start("html");
+          }else{
+               ob_end_flush();
+          }
+     }
+
+
+     /**
       * [get_all_buckets obtiene todos los buscket asociados a la cuenta]
       * @return [array] [listado de todos los buckets]
       */

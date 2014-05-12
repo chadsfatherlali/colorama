@@ -4,6 +4,7 @@ include "s3helper.php";
 $portales = $s3h->get_mobile_web_sites();
 $allskins = $s3h->get_all_files_json();
 $buckets = $s3h->get_buckets_used_and_unused();
+$s3h->minifyHTML("inicio");
 ?>
 <!doctype html>
 <html lang="es" ng-app="App">
@@ -120,3 +121,5 @@ $buckets = $s3h->get_buckets_used_and_unused();
 <script type="text/javascript" src="scripts.js"></script>
 </body>
 </html>
+
+<? $s3h->minifyHTML("fin"); ?>
