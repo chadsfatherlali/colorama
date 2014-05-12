@@ -4,7 +4,6 @@ include "s3helper.php";
 $portales = $s3h->get_mobile_web_sites();
 $allskins = $s3h->get_all_files_json();
 $buckets = $s3h->get_buckets_used_and_unused();
-
 ?>
 <!doctype html>
 <html lang="es" ng-app="App">
@@ -26,6 +25,10 @@ $buckets = $s3h->get_buckets_used_and_unused();
      <script type="text/javascript" src="vendor/chosen.jquery.js"></script>
      <script type="text/javascript" src="chosen.js"></script>     
      <script type="text/javascript" src="bootstrap-colorpicker-module.js"></script>
+
+     <script type="text/javascript" src="ngDirectives/ngDirectives.js"></script>
+     <script type="text/javascript" src="ngFactories/ngFactories.js"></script>
+     <script type="text/javascript" src="ngControllers/ngControllers.js"></script>
      
      <script>
           window.Portales = <? echo json_encode($portales) ?>;
