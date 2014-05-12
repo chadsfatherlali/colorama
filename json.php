@@ -5,13 +5,13 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
      $datosNombre = json_decode($datos, true);
 
      if(isset($_GET["render"]) 
-     && $_GET["render"] == 1){
+     && $_GET["render"] == 1) {
           
           header("Content-Description: File Transfer"); 
           header("Content-Type: application/octet-stream");
           header("Content-disposition: attachment; filename='" . $datosNombre["dummynombre_null"] . ".js'");
      }else if(isset($_GET["render"])
-          && $_GET["render"] == 2){
+     && $_GET["render"] == 2) {
           
           header("Content-Description: File Transfer"); 
           header("Content-Type: application/octet-stream");
@@ -25,41 +25,42 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
      $datos = file_get_contents("php://input");
      $get = json_decode($datos, true);
 
-     if(isset($get["accion"]) && $get["accion"] == "set") {
-          
-          $skin = str_replace(" - ", "/", $get["nombre"]);
-          $datos = file_get_contents("https://b2c-docs.s3.amazonaws.com/colorama_landings/" . $skin);
-          echo $datos;
+     if(isset($get["accion"])) {
+          switch ($get["accion"]) {
+               case "set":
+                    $skin = str_replace(" - ", "/", $get["nombre"]);
+                    $datos = file_get_contents("https://b2c-docs.s3.amazonaws.com/colorama_landings/" . $skin);
+                    echo $datos;
+               break;
 
-     }else if(isset($get["accion"]) && $get["accion"] == "comprobar") { 
-          
-          $result = $s3h->get_files_json($get["portal_id"]);
-          echo json_encode($result);
+               case "comprobar":
+                    $result = $s3h->get_files_json($get["portal_id"]);
+                    echo json_encode($result);
+               break;
 
-     }else if(isset($get["accion"]) && $get["accion"] == "borrar") {
-          
-          $result = $s3h->delete_skin($get["portal_id"], $get["skin_name"]);
-          echo json_encode($result);
+               case "borrar":
+                    $result = $s3h->delete_skin($get["portal_id"], $get["skin_name"]);
+                    echo json_encode($result);
+               break;
 
-     }else if(isset($get["accion"]) && $get["accion"] == "duplicar") {
+               case "duplicar":
+                    $result = $s3h->duplicate_buckets($get["portal_origen"], $get["portal_destino"]);
+                    echo json_encode($result);
+               break;
 
-          $result = $s3h->duplicate_buckets($get["portal_origen"], $get["portal_destino"]);
-          echo json_encode($result);
-
-     }else if(isset($get["accion"]) && $get["accion"] == "borrarbucket") {
-
-          $result = $s3h->delete_bucket_obj($get["portal_borrar"]);
-          echo json_encode($result);          
-
+               case "borrarbucket":
+                    $result = $s3h->delete_bucket_obj($get["portal_borrar"]);
+                    echo json_encode($result);                              
+               break;
+          }
      }else{
           $result = $s3h->upload_generate_json($datos);
 
-          if($result["success"]){
+          if($result["success"]) {
                echo json_encode($result);
           }else{
                echo false;
           }
-
      }
 }
 ?>

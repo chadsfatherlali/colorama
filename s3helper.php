@@ -166,7 +166,7 @@ class s3helper extends AmazonS3 {
                "pcre" => "/colorama_landings/"
           ));
 
-          if(!empty($archivos)){
+          if(!empty($archivos)) {
                $coincidencias = preg_grep($patron, $archivos);
 
                foreach ($coincidencias as $value) {
@@ -201,7 +201,7 @@ class s3helper extends AmazonS3 {
                "pcre" => $carpetasplit
           ));
 
-          if(!empty($archivos)){
+          if(!empty($archivos)) {
                $coincidencias = preg_grep($patron, $archivos);
 
                foreach ($coincidencias as $value) {
