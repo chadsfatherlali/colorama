@@ -267,6 +267,12 @@ class s3helper extends AmazonS3 {
      }
 
 
+     /**
+      * [delete_skin función que borra un skin]
+      * @param  [string] $portal [id del portal equivalente a el nombre en el bucket de amazon]
+      * @param  [string] $skin   [nombre del skin]
+      * @return [array]
+      */
      public function delete_skin($portal, $skin) {
           $objeto = "colorama_landings/". $portal . "/" . $skin . ".js";
           $result = $this->delete_object($this->bucketname, $objeto);
