@@ -4,6 +4,8 @@ include "s3helper.php";
 $portales = $s3h->get_mobile_web_sites();
 $allskins = $s3h->get_all_files_json();
 $buckets = $s3h->get_buckets_used_and_unused();
+$landings = $s3h->get_creatividades();
+
 $s3h->minifyHTML("inicio");
 ?>
 
@@ -33,6 +35,7 @@ $s3h->minifyHTML("inicio");
      <script type="text/javascript" src="ngControllers/ngControllers.js"></script>
      
      <script>
+          window.Landings = <? echo json_encode($landings) ?>;
           window.Portales = <? echo json_encode($portales) ?>;
           window.AllSkins = <? echo json_encode($allskins) ?>;
           window.BucketsConContenido = <? echo json_encode($buckets) ?>;
@@ -97,6 +100,13 @@ $s3h->minifyHTML("inicio");
                     <input name="dummylayer_null" id="dummyinputlayer" ng-model="Mcolorama.dummylayer_null" type="text" numerico placeholder="Número del LAYER (opcional)" value="" />
                </fieldset>
 
+               <!-- <fieldset>
+                    <legend>Asignar a creatividad (opcional):</legend>
+                    <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge una creatividad" id="portalSelect" ng-model="Mcolorama.creatividad_asignada" ng-options="(l.id + ' -- ' + l.nombre + ' -- ' + l.ruta) for l in Landings">
+                         <option value=""></option>
+                    </select>
+               </fieldset> -->
+
                <button id="generar-y-guardar" ng-click="gd(Mcolorama)" ng-if="envioDatos">Generar y Descargar</button>
           </form>
      </div>     
@@ -105,13 +115,16 @@ $s3h->minifyHTML("inicio");
           <select ng-model="cartaPago" ng-change="setCartaPago()" ng-options="p.nombre for p in cartasPago"></select>
           
           <h4>Todos los skins disponibles</h4>
-          <button id="borrarSkin" ng-if="permitidoBorrar" confirmed-click="borrarSkin()" ng-confirm-click>Borrar Skin</button>
+          
+          <button id="borrarSkin" ng-if="permitidoBorrar" confirmed-click="borrarSkin()" ng-confirm-click>Borrar - Skin</button>
+          <button id="descargarIMG" ng-if="Mcolorama.dummyimg_backgroundimage" ng-click="getIMG()">Descargar - Imagen BG</button>
+          <button id="descargarSkin" ng-if="permitidoDescargar" ng-click="descargarSkin()">Descargar - Skin</button>
+          
           <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in AllSkins">
                <option value=""></option>
           </select>
 
-          <div ng-view></div>
-          <button ng-if="Mcolorama.dummyimg_backgroundimage" ng-click="getIMG()">Descargar Imagen BG</button>
+          <div ng-view></div>          
      </div>
 
      <div class="modulos" id="modulo-json">

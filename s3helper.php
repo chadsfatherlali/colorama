@@ -292,15 +292,15 @@ class s3helper extends AmazonS3 {
           $datos = json_decode($datos, true);
           $carpeta = "colorama_landings/" . $datos["dummy_portal"] . "/";
 
-          $existePorNumero = $this->if_object_exists($this->bucketname, $carpeta . $datos["dummylayer_null"] . ".js");
-          $existePorNombre = $this->if_object_exists($this->bucketname, $carpeta . $datos["dummynombre_null"] . ".js");
+          @$existePorNumero = $this->if_object_exists($this->bucketname, $carpeta . $datos["dummylayer_null"] . ".js");
+          @$existePorNombre = $this->if_object_exists($this->bucketname, $carpeta . $datos["dummynombre_null"] . ".js");
 
           if($existePorNumero 
           || $existePorNombre) {
 
                $response["success"] = false;
                $response["detalle"] = "existe";
-               
+
                return $response;
           }
 
@@ -350,6 +350,21 @@ class s3helper extends AmazonS3 {
           }
 
           return $this->portales_mobile;
+     }
+
+
+     public function get_creatividades() {
+          $sql = "select * from landings_creatividades";
+          $response = db::query("b2c", $sql, array());
+          $creatividades = array();
+          
+          foreach ($response as $key => $value) {
+               $creatividades[$key]["nombre"] = $value["plan_nombre"];
+               $creatividades[$key]["ruta"] = $value["plan_uri"];
+               $creatividades[$key]["id"] = $value["plan_id"];
+          }
+
+          return $creatividades;
      }
 }
 

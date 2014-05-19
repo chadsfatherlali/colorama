@@ -6,6 +6,7 @@ var _controllers_ = angular.module("_controllers_", []);
  */
 _controllers_.controller("mainController", function($rootScope, $scope, $window, $http, $routeParams, $location, $sce, $compile) {
      $scope.permitidoBorrar = false;
+     $scope.permitidoDescargar = false;
      $scope.menudesplegado = false;
      $scope.pais = "espana";
      $scope.Skins = [];
@@ -17,6 +18,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
      $rootScope.rootImg = null;
      $scope.Portales = $window.Portales;
      $scope.AllSkins = $window.AllSkins["objetos"];
+     $scope.Landings = $window.Landings;
      $scope.BucketLlenos = $window.BucketsConContenido["full"];
      $scope.BucketVacios = $window.BucketsConContenido["empty"];     
      $scope.cartasPago = [
@@ -36,6 +38,17 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
           $scope.Mcolorama.dummyimg_backgroundimageanimated = $rootScope.rootName;
           $scope.Mcolorama.dummyimg_backgroundimage = $rootScope.rootImg;
      });
+
+
+     /**
+      * [descargarSkin Función que nos permite descarganos los skin js]
+      * @return {[null]} 
+      */
+     $scope.descargarSkin = function() {
+          if($scope.Mcolorama.dummylayer_null) window.open("json.php?objetojson=" + $scope.Mcolorama.dummylayer_null + "&portal=" + $scope.Mcolorama.dummy_portal + "&render=2", "_blank", "width=500,height=10,left=500,top=0");
+
+          window.open("json.php?objetojson=" + $scope.Mcolorama.dummynombre_null + "&portal=" + $scope.Mcolorama.dummy_portal + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
+     }
   
 
      /**
@@ -210,6 +223,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
       * @return {[objeto]}
       */
      $scope.formularioColorama = function($scope, enviarImg) {
+          $scope.optionsLandings = $scope.Landings;
           $scope.imagen = null;               
           $scope.setValuesForm = false;
 
@@ -272,7 +286,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
 
                          } else if(!data["success"]
                          && data["detalle"] == "existe") {
-                              alert("Ya existe un SKIN con ese ID ó NOMBRE.");
+                              alert("Ya existe un SKIN con ese ID ó NOMBRE, elige otros.");
                               $scope.envioDatos = true;                              
                          } else {
                               alert("Se ha producido un error.");
@@ -280,11 +294,13 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
                          }
 
                          $scope.permitidoBorrar = true;
+                         $scope.permitidoDescargar = true;
                          $rootScope.listo = false;
                          $scope.envioDatos = true;
                     })
                     .error(function(data, status, headers, config) {
                          $scope.permitidoBorrar = false;
+                         $scope.permitidoDescargar = true;
                          try{console.log("ERROR1:", status)}catch(err) {}
                          try{console.log("ERROR2:", headers)}catch(err) {}
                     });
@@ -315,10 +331,12 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
                $rootScope.rootImg = $scope.Mcolorama.dummyimg_backgroundimage;
 
                $scope.permitidoBorrar = true;
+               $scope.permitidoDescargar = true;
                $rootScope.listo = false;
           })
           .error(function(data, status, headers, config) {
                $scope.permitidoBorrar = false;
+               $scope.permitidoDescargar = false;
 
                try{console.log("ERROR1:", status)}catch(err) {}
                try{console.log("ERROR2:", headers)}catch(err) {}
