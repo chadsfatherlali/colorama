@@ -223,7 +223,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
            * @param  {[objeto]} $scope [entorno de de la aplicacion donde se encuentra el modelo del JSON]
            * @return {[null]}
            */          
-          $scope.gd = function(Mcolorama) {
+          $scope.gd = function(Mcolorama) {              
                $rootScope.listo = true;
                $scope.envioDatos = false;
 
@@ -250,6 +250,8 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
 
                     $http.post("json.php", Mcolorama)
                     .success(function(data, status, headers, config) {
+                         console.log("DEV:", data);
+
                          if(data["success"]) {
 
                               var nuevoSkin = data["objeto"]["dummy_portal"] + " - " + data["objeto"]["dummynombre_null"] + ".js";
@@ -267,7 +269,11 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
                               if(data["objeto"]["dummylayer_null"]) window.open("json.php?objetojson=" + data["objeto"]["dummylayer_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=2", "_blank", "width=500,height=10,left=500,top=0");
 
                               window.open("json.php?objetojson=" + data["objeto"]["dummynombre_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
-                              //window.top.location.reload();
+
+                         } else if(!data["success"]
+                         && data["detalle"] == "existe") {
+                              alert("Ya existe un SKIN con ese ID ó NOMBRE.");
+                              $scope.envioDatos = true;                              
                          } else {
                               alert("Se ha producido un error.");
                               $scope.envioDatos = true;

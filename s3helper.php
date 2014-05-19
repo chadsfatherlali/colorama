@@ -10,6 +10,7 @@ class s3helper extends AmazonS3 {
      private $portales_mobile;
      private $portales_result;
 
+
      /**
       * [__construct iniciamos constructor parent AmazonS3]
       */
@@ -290,6 +291,18 @@ class s3helper extends AmazonS3 {
           $replica = null;
           $datos = json_decode($datos, true);
           $carpeta = "colorama_landings/" . $datos["dummy_portal"] . "/";
+
+          $existePorNumero = $this->if_object_exists($this->bucketname, $carpeta . $datos["dummylayer_null"] . ".js");
+          $existePorNombre = $this->if_object_exists($this->bucketname, $carpeta . $datos["dummynombre_null"] . ".js");
+
+          if($existePorNumero 
+          || $existePorNombre) {
+
+               $response["success"] = false;
+               $response["detalle"] = "existe";
+               
+               return $response;
+          }
 
           if(isset($datos["dummylayer_null"])) {
                $replica = $datos["dummylayer_null"] . "===" . $datos["dummynombre_null"];

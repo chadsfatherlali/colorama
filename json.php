@@ -55,12 +55,8 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
           }
      }else{
           $result = $s3h->upload_generate_json($datos);
-
-          if($result["success"]) {
-               echo json_encode($result);
-          }else{
-               echo false;
-          }
+          
+          echo json_encode($result);
      }
 }
 ?>
