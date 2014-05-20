@@ -210,13 +210,11 @@ class s3helper extends AmazonS3 {
                }
 
                $response["success"] = true;
-
-               return $response;
           }else{
                $response["success"] = false;               
-               
-               return $response;
           }
+
+               return $response;
      }
 
 
@@ -245,13 +243,11 @@ class s3helper extends AmazonS3 {
                }
 
                $response["success"] = true;
-
-               return $response;
           }else{
                $response["success"] = false;
-               
-               return $response;
           }
+
+          return $response;
      }
 
 
