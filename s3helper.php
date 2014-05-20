@@ -214,7 +214,7 @@ class s3helper extends AmazonS3 {
                $response["success"] = false;               
           }
 
-               return $response;
+          return $response;
      }
 
 
