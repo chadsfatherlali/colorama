@@ -4,7 +4,7 @@ include "s3helper.php";
 $portales = $s3h->get_mobile_web_sites();
 $allskins = $s3h->get_all_files_json();
 $buckets = $s3h->get_buckets_used_and_unused();
-$landings = $s3h->get_creatividades();
+//$landings = $s3h->get_creatividades();
 
 $s3h->minifyHTML("inicio");
 ?>
