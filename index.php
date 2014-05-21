@@ -34,8 +34,7 @@ $s3h->minifyHTML("inicio");
      <script type="text/javascript" src="ngFactories/ngFactories.js"></script>
      <script type="text/javascript" src="ngControllers/ngControllers.js"></script>
      
-     <script>
-          window.Landings = <? echo json_encode($landings) ?>;
+     <script>          
           window.Portales = <? echo json_encode($portales) ?>;
           window.AllSkins = <? echo json_encode($allskins) ?>;
           window.BucketsConContenido = <? echo json_encode($buckets) ?>;
@@ -70,56 +69,11 @@ $s3h->minifyHTML("inicio");
           <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" id="skinsSelect" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in Skins">
                <option value=""></option>
           </select>
+          
           <span class="replica" ng-if="Mcolorama.replica"><strong>REPLICA:</strong> {{Mcolorama.replica}}</span>
      </fieldset>
      
-     <div>
-          <form name="formColorama" class="modulos" id="landings" ng-controller="formularioColorama">
-               <fieldset>
-                    <legend>Color Background:</legend>
-                    <input name="dummy_backgroundcolor" id="dummyinput" ng-model="Mcolorama.dummy_backgroundcolor" colorpicker hexadecimal type="text" placeholder="Color Background" value="" />
-               </fieldset>
-
-               <fieldset>
-                    <legend>Color Boton:</legend>
-                    <input name="dummyboton_backgroundcolor" id="dummyinputboton" ng-model="Mcolorama.dummyboton_backgroundcolor" colorpicker hexadecimal type="text" placeholder="Color Botón" value="" />
-               </fieldset>
-
-               <fieldset>
-                    <legend>Color Texto Botón:</legend>
-                    <input name="dummytextoboton_color" id="dummyinputtextoboton" ng-model="Mcolorama.dummytextoboton_color" colorpicker hexadecimal type="text" placeholder="Color Texto Botón" value="" />
-               </fieldset>
-
-               <fieldset>
-                    <legend>Color Texto:</legend>
-                    <input name="dummytexto_color" id="dummyinputtexto" ng-model="Mcolorama.dummytexto_color" colorpicker hexadecimal type="text" placeholder="Color Texto" value="" />
-               </fieldset>
-
-               <fieldset>
-                    <legend>Imagen Cabecera:</legend>
-                    <input name="dummyimg_backgroundimage" id="dummyinputimg" ng-model="Mcolorama.dummyimg_backgroundimage" class="dropzone" placeholder="Suelta aquí la imagen" soltar-archivos="[image/png, image/jpeg, image/gif]" />
-               </fieldset>
-
-               <fieldset>
-                    <legend>Nombre del SKIN:</legend>
-                    <input name="dummynombre_null" id="dummyinputnombre" ng-model="Mcolorama.dummynombre_null" type="text" alfanumericos placeholder="Nombre del SKIN" value="" />
-               </fieldset>
-
-               <fieldset>
-                    <legend>Número del LAYER (opcional):</legend>
-                    <input name="dummylayer_null" id="dummyinputlayer" ng-model="Mcolorama.dummylayer_null" type="text" numerico placeholder="Número del LAYER (opcional)" value="" />
-               </fieldset>
-
-               <!-- <fieldset>
-                    <legend>Asignar a creatividad (opcional):</legend>
-                    <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge una creatividad" id="portalSelect" ng-model="Mcolorama.creatividad_asignada" ng-options="(l.id + ' -- ' + l.nombre + ' -- ' + l.ruta) for l in Landings">
-                         <option value=""></option>
-                    </select>
-               </fieldset> -->
-
-               <button id="generar-y-guardar" ng-click="gd(Mcolorama)" ng-if="envioDatos">Generar y Descargar</button>
-          </form>
-     </div>     
+     <div ng-include="'ngincludes/formularioprincipal.html'"></div>
 
      <div class="modulos" id="modulo-dummy">          
           <select ng-model="cartaPago" ng-change="setCartaPago()" ng-options="p.nombre for p in cartasPago"></select>

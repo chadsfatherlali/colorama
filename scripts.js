@@ -12,7 +12,7 @@
           "_directives_",
           "_factories_"
      ]);
-     
+
 
      /**
       * [Estable los dummys para la aplicación]

@@ -1,6 +1,5 @@
 var _controllers_ = angular.module("_controllers_", []);
 
-
 /**
  * Controlador principal de la aplicación;
  */
@@ -18,7 +17,6 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
      $rootScope.rootImg = null;
      $scope.Portales = $window.Portales;
      $scope.AllSkins = $window.AllSkins["objetos"];
-     $scope.Landings = $window.Landings;
      $scope.BucketLlenos = $window.BucketsConContenido["full"];
      $scope.BucketVacios = $window.BucketsConContenido["empty"];     
      $scope.cartasPago = [
@@ -38,7 +36,6 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
           $scope.Mcolorama.dummyimg_backgroundimageanimated = $rootScope.rootName;
           $scope.Mcolorama.dummyimg_backgroundimage = $rootScope.rootImg;
      });
-
 
      /**
       * [descargarSkin Función que nos permite descarganos los skin js]
