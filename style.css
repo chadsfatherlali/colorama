@@ -417,3 +417,8 @@ header #opciones .modulos{
      padding: 2em;
      margin: 2em;
 }
+
+
+.formularioHeader{
+     float: inherit !important;
+}

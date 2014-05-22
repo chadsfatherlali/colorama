@@ -111,8 +111,8 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
           $scope.menudesplegado = ($scope.menudesplegado)? false : true;
 
           var texto = ($scope.menudesplegado)
-          ? "=> CERRAR"
-          : "=> OPCIONES"
+          ? "CERRAR"
+          : "OPCIONES"
 
           angular.element($event.target).html(texto);
      }

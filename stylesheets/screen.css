@@ -1,0 +1,461 @@
+/**
+ * Eric Meyer's Reset CSS v2.0 (http://meyerweb.com/eric/tools/css/reset/)
+ * http://cssreset.com
+ */
+/* line 17, ../sass/_reset.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+/* line 27, ../sass/_reset.scss */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+/* line 30, ../sass/_reset.scss */
+body {
+  line-height: 1;
+}
+
+/* line 33, ../sass/_reset.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 36, ../sass/_reset.scss */
+blockquote, q {
+  quotes: none;
+}
+
+/* line 40, ../sass/_reset.scss */
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+/* line 44, ../sass/_reset.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 3, ../sass/_estilos.scss */
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* line 9, ../sass/_estilos.scss */
+html, body {
+  font-family: Arial;
+}
+
+/* line 13, ../sass/_estilos.scss */
+button {
+  border: 0;
+  background: #05a7ed;
+  color: white;
+  padding: 1em;
+  margin-top: 1.5em;
+  border: 1px dotted #05a7ed;
+  -webkit-transition: background 0.2s;
+  -moz-transition: background 0.2s;
+  -ms-transition: background 0.2s;
+  -o-transition: background 0.2s;
+  transition: background 0.2s;
+}
+/* line 25, ../sass/_estilos.scss */
+button:hover {
+  color: #05a7ed;
+  background: white;
+  border: 1px dotted grey;
+}
+
+/* line 32, ../sass/_estilos.scss */
+legend {
+  text-transform: uppercase;
+  text-align: left;
+  margin-bottom: 1em;
+  font-weight: bold;
+  border-bottom: 1px solid #05a7ed;
+  padding-bottom: 0.2em;
+}
+
+/* line 41, ../sass/_estilos.scss */
+h3 {
+  margin-top: 2em;
+  margin-bottom: 0.3em;
+  font-weight: bold;
+}
+/* line 45, ../sass/_estilos.scss */
+h3:first-child {
+  margin-top: 0px;
+}
+
+/* line 50, ../sass/_estilos.scss */
+a {
+  cursor: pointer;
+  text-decoration: none !important;
+}
+
+/* line 55, ../sass/_estilos.scss */
+header {
+  position: fixed;
+  width: 100%;
+  height: 90%;
+  z-index: 9998;
+  background: white;
+  box-shadow: 0 4px 2px -2px gray;
+  -webkit-transform: translate(0%, -100%);
+  -moz-transform: translate(0%, -100%);
+  -ms-transform: translate(0%, -100%);
+  -o-transform: translate(0%, -100%);
+  transform: translate(0%, -100%);
+  -webkit-transition: -webkit-transform 0.2s;
+  -moz-transition: -moz-transform 0.2s;
+  -ms-transition: -ms-transform 0.2s;
+  -o-transition: -o-transform 0.2s;
+  transition: transform 0.2s;
+}
+/* line 72, ../sass/_estilos.scss */
+header div#opciones {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+/* line 79, ../sass/_estilos.scss */
+header a#menu {
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  display: block;
+  padding: 1em;
+  background: #05A7ED;
+  color: white;
+  box-shadow: 0 4px 2px -2px gray;
+}
+/* line 89, ../sass/_estilos.scss */
+header.menudesplegado {
+  -webkit-transform: translate(0%, 0%);
+  -moz-transform: translate(0%, 0%);
+  -ms-transform: translate(0%, 0%);
+  -o-transform: translate(0%, 0%);
+  transform: translate(0%, 0%);
+}
+
+/* line 98, ../sass/_estilos.scss */
+.modulos {
+  padding: 2em;
+  border: 1px dotted grey;
+  float: left;
+  margin: 1em;
+}
+
+/* line 105, ../sass/_estilos.scss */
+div#wrapper {
+  padding: 0.2em;
+  width: 100%;
+  height: auto;
+}
+
+/* line 111, ../sass/_estilos.scss */
+div.formularioHeader {
+  padding: 2em;
+  border: 1px dotted grey;
+  float: inherit !important;
+}
+/* line 115, ../sass/_estilos.scss */
+div.formularioHeader div#skinsSelect_chosen {
+  width: 28% !important;
+}
+/* line 119, ../sass/_estilos.scss */
+div.formularioHeader span.replica strong {
+  color: #05a7ed;
+}
+
+/* line 125, ../sass/_estilos.scss */
+form#landings {
+  width: 30%;
+}
+/* line 127, ../sass/_estilos.scss */
+form#landings fieldset {
+  margin-top: 1.2em;
+}
+/* line 129, ../sass/_estilos.scss */
+form#landings fieldset:first-child {
+  margin-top: 0;
+}
+/* line 132, ../sass/_estilos.scss */
+form#landings fieldset input {
+  border: none;
+  padding: 0.2em;
+  width: 100%;
+}
+/* line 136, ../sass/_estilos.scss */
+form#landings fieldset input#dummyinputimg {
+  border: 2px dotted grey;
+  text-align: center;
+  padding: 1em;
+}
+
+/* line 145, ../sass/_estilos.scss */
+div#modulo-dummy {
+  width: 66%;
+}
+/* line 147, ../sass/_estilos.scss */
+div#modulo-dummy fieldset {
+  margin-top: 1em;
+}
+/* line 149, ../sass/_estilos.scss */
+div#modulo-dummy fieldset button#borrarSkin {
+  background: #D94C36;
+  border-color: #D94C36;
+}
+/* line 152, ../sass/_estilos.scss */
+div#modulo-dummy fieldset button#borrarSkin:hover {
+  background: white;
+  color: #D94C36;
+}
+/* line 157, ../sass/_estilos.scss */
+div#modulo-dummy fieldset button#descargarIMG {
+  background: #FFDA6B;
+  border-color: #FFDA6B;
+  color: black;
+}
+/* line 161, ../sass/_estilos.scss */
+div#modulo-dummy fieldset button#descargarIMG:hover {
+  background: white;
+  color: #FFDA6B;
+}
+/* line 166, ../sass/_estilos.scss */
+div#modulo-dummy fieldset button#descargarSkin {
+  background: #85B340;
+  border-color: #85B340;
+}
+/* line 169, ../sass/_estilos.scss */
+div#modulo-dummy fieldset button#descargarSkin:hover {
+  background: white;
+  color: #85B340;
+}
+
+/* line 177, ../sass/_estilos.scss */
+div#modulo-json {
+  width: 72%;
+  overflow: auto;
+}
+
+/* line 182, ../sass/_estilos.scss */
+div#dummy {
+  float: left;
+  margin-top: 1em;
+  width: 300px;
+  height: 550px;
+  border: 1px dotted black;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
+/* line 191, ../sass/_estilos.scss */
+div#dummy #dummyheader {
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height: 240px;
+  background-size: cover;
+  border-bottom: 1px dotted grey;
+  -webkit-border-top-left-radius: 10px;
+  -webkit-border-top-right-radius: 10px;
+  -moz-border-radius-topleft: 10px;
+  -moz-border-radius-topright: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+/* line 205, ../sass/_estilos.scss */
+div#dummy #dummyboton {
+  width: 80%;
+  height: 80px;
+  margin: auto;
+  margin-top: 40px;
+  text-align: center;
+  font-size: 3em;
+  font-weight: bold;
+  line-height: 80px;
+  border: 1px dotted black;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+}
+/* line 219, ../sass/_estilos.scss */
+div#dummy #dummytexto {
+  padding: 2em;
+  margin-top: 0px;
+}
+
+/*===================================
+= LOADER ============================
+===================================*/
+/* line 229, ../sass/_estilos.scss */
+div#loader {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  background: rgba(250, 250, 250, 0.8);
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 9999;
+}
+
+@-webkit-keyframes loading {
+  /* line 241, ../sass/_estilos.scss */
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+
+  /* line 245, ../sass/_estilos.scss */
+  25% {
+    -webkit-transform: rotate(160deg);
+  }
+
+  /* line 249, ../sass/_estilos.scss */
+  50% {
+    -webkit-transform: rotate(0deg);
+  }
+
+  /* line 253, ../sass/_estilos.scss */
+  75% {
+    -webkit-transform: rotate(160deg);
+  }
+
+  /* line 257, ../sass/_estilos.scss */
+  100% {
+    -webkit-transform: rotate(0deg);
+  }
+}
+
+@keyframes loading {
+  /* line 263, ../sass/_estilos.scss */
+  0% {
+    transform: rotate(0deg);
+  }
+
+  /* line 267, ../sass/_estilos.scss */
+  25% {
+    transform: rotate(160deg);
+  }
+
+  /* line 271, ../sass/_estilos.scss */
+  50% {
+    transform: rotate(0deg);
+  }
+
+  /* line 275, ../sass/_estilos.scss */
+  75% {
+    transform: rotate(160deg);
+  }
+
+  /* line 279, ../sass/_estilos.scss */
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* line 284, ../sass/_estilos.scss */
+.content-loader {
+  margin: auto;
+  margin-top: 20%;
+}
+
+/* line 289, ../sass/_estilos.scss */
+.loading {
+  background-color: transparent;
+  border-radius: 50%;
+  margin: 5px auto;
+  -webkit-animation: loading 5s infinite linear;
+  animation: loading 5s infinite linear;
+}
+
+/* line 297, ../sass/_estilos.scss */
+.spin-1 {
+  border: 5px solid #c00353;
+  border-top: 5px solid transparent;
+  border-left: 5px solid transparent;
+  width: 120px;
+  height: 120px;
+}
+
+/* line 305, ../sass/_estilos.scss */
+.spin-2 {
+  border: 5px solid #05bbc3;
+  border-top: 5px solid transparent;
+  border-left: 5px solid transparent;
+  width: 100px;
+  height: 100px;
+  -webkit-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}
+
+/* line 315, ../sass/_estilos.scss */
+.spin-3 {
+  border: 5px solid #d2d947;
+  border-top: 5px solid transparent;
+  border-left: 5px solid transparent;
+  width: 80px;
+  height: 80px;
+  -webkit-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}
+
+/* line 325, ../sass/_estilos.scss */
+.spin-4 {
+  border: 5px solid #f2a342;
+  border-top: 5px solid transparent;
+  border-left: 5px solid transparent;
+  width: 60px;
+  height: 60px;
+  -webkit-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}
+
+/* line 335, ../sass/_estilos.scss */
+.spin-5 {
+  border: 5px solid #f34d51;
+  border-top: 5px solid transparent;
+  border-left: 5px solid transparent;
+  width: 40px;
+  height: 40px;
+  -webkit-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}
+
+/* line 345, ../sass/_estilos.scss */
+.spin-6 {
+  border: 5px solid white;
+  width: 20px;
+  height: 20px;
+  -webkit-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}

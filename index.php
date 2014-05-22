@@ -20,7 +20,7 @@ $s3h->minifyHTML("inicio");
      <link rel="stylesheet" type="text/css" href="vendor/chosen.css">
      <link rel="stylesheet" type="text/css" href="chosen-spinner.css">
      <link href="colorpicker.css" rel="stylesheet">
-     <link href="style.css" rel="stylesheet">
+     <link href="stylesheets/screen.css" rel="stylesheet">
 
      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>     
      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
@@ -56,44 +56,50 @@ $s3h->minifyHTML("inicio");
 
      <header ng-class="{menudesplegado: menudesplegado == true}">
           <div id="opciones" ng-include="'ngincludes/opciones.html'"></div>
-          <a id="menu" ng-click="desplegarmenu($event)">=> OPCIONES</a>
+          <a id="menu" ng-click="desplegarmenu($event)">OPCIONES</a>
      </header>
      
-     <fieldset>
-          <legend>Portales disponibles:</legend>
-          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Portal" id="portalSelect" ng-model="portal" ng-change="checkPortal(portal)" ng-options="(p.w_alias + ' -- ' + p.w_id) for p in Portales">
-               <option value=""></option>
-          </select>
-          <legend>Skins disponibles:</legend>
+     <div id="wrapper">
+          <div class="modulos formularioHeader">
+               <h3>Portales disponibles:</h3>
+               <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Portal" id="portalSelect" ng-model="portal" ng-change="checkPortal(portal)" ng-options="(p.w_alias + ' -- ' + p.w_id) for p in Portales">
+                    <option value=""></option>
+               </select>
 
-          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" id="skinsSelect" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in Skins">
-               <option value=""></option>
-          </select>
-          
-          <span class="replica" ng-if="Mcolorama.replica"><strong>REPLICA:</strong> {{Mcolorama.replica}}</span>
-     </fieldset>
-     
-     <div ng-include="'ngincludes/formularioprincipal.html'"></div>
+               <h3>Skins disponibles:</h3>
+               <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" id="skinsSelect" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in Skins">
+                    <option value=""></option>
+               </select>
 
-     <div class="modulos" id="modulo-dummy">          
-          <select ng-model="cartaPago" ng-change="setCartaPago()" ng-options="p.nombre for p in cartasPago"></select>
+               <span class="replica" ng-if="Mcolorama.replica"><strong>REPLICA:</strong> {{Mcolorama.replica}}</span>
+          </div>
           
-          <h4>Todos los skins disponibles</h4>
-          
-          <button id="borrarSkin" ng-if="permitidoBorrar" confirmed-click="borrarSkin()" ng-confirm-click>Borrar - Skin</button>
-          <button id="descargarIMG" ng-if="Mcolorama.dummyimg_backgroundimage" ng-click="getIMG()">Descargar - Imagen BG</button>
-          <button id="descargarSkin" ng-if="permitidoDescargar" ng-click="descargarSkin()">Descargar - Skin</button>
-          
-          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in AllSkins">
-               <option value=""></option>
-          </select>
+          <div ng-include="'ngincludes/formularioprincipal.html'"></div>
 
-          <div ng-view></div>          
-     </div>
+          <div class="modulos" id="modulo-dummy">          
+               <!-- <select ng-model="cartaPago" ng-change="setCartaPago()" ng-options="p.nombre for p in cartasPago"></select> -->
+               
+               <fieldset>
+                    <legend>Todos los skins disponibles</legend>
+                    
+                    <button id="borrarSkin" ng-if="permitidoBorrar" confirmed-click="borrarSkin()" ng-confirm-click>Borrar - Skin</button>
+                    <button id="descargarIMG" ng-if="Mcolorama.dummyimg_backgroundimage" ng-click="getIMG()">Descargar - Imagen BG</button>
+                    <button id="descargarSkin" ng-if="permitidoDescargar" ng-click="descargarSkin()">Descargar - Skin</button>
+                    
+                    <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in AllSkins">
+                         <option value=""></option>
+                    </select>
+               </fieldset>
 
-     <div class="modulos" id="modulo-json">
-          <h2>Dummy JSON:</h2>
-          <p>{{Mcolorama | json}}</p>
+               <div ng-view></div>
+
+               <div class="modulos" id="modulo-json">
+                    <fieldset>
+                         <legend>Dummy JSON:</legend>
+                         <p>{{Mcolorama | json}}</p>
+                    </fieldset>
+               </div>
+          </div>
      </div>
 
 <script type="text/javascript" src="scripts.js"></script>
