@@ -264,10 +264,13 @@ div#modulo-dummy fieldset button#descargarSkin:hover {
 /* line 177, ../sass/_estilos.scss */
 div#modulo-json {
   width: 72%;
+}
+/* line 179, ../sass/_estilos.scss */
+div#modulo-json p {
   overflow: auto;
 }
 
-/* line 182, ../sass/_estilos.scss */
+/* line 184, ../sass/_estilos.scss */
 div#dummy {
   float: left;
   margin-top: 1em;
@@ -278,7 +281,7 @@ div#dummy {
   -moz-border-radius: 10px;
   border-radius: 10px;
 }
-/* line 191, ../sass/_estilos.scss */
+/* line 193, ../sass/_estilos.scss */
 div#dummy #dummyheader {
   background-repeat: no-repeat;
   background-position: center;
@@ -293,7 +296,7 @@ div#dummy #dummyheader {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
-/* line 205, ../sass/_estilos.scss */
+/* line 207, ../sass/_estilos.scss */
 div#dummy #dummyboton {
   width: 80%;
   height: 80px;
@@ -308,7 +311,7 @@ div#dummy #dummyboton {
   -moz-border-radius: 50px;
   border-radius: 50px;
 }
-/* line 219, ../sass/_estilos.scss */
+/* line 221, ../sass/_estilos.scss */
 div#dummy #dummytexto {
   padding: 2em;
   margin-top: 0px;
@@ -317,7 +320,7 @@ div#dummy #dummytexto {
 /*===================================
 = LOADER ============================
 ===================================*/
-/* line 229, ../sass/_estilos.scss */
+/* line 231, ../sass/_estilos.scss */
 div#loader {
   position: fixed;
   top: 0px;
@@ -330,66 +333,66 @@ div#loader {
 }
 
 @-webkit-keyframes loading {
-  /* line 241, ../sass/_estilos.scss */
+  /* line 243, ../sass/_estilos.scss */
   0% {
     -webkit-transform: rotate(0deg);
   }
 
-  /* line 245, ../sass/_estilos.scss */
+  /* line 247, ../sass/_estilos.scss */
   25% {
     -webkit-transform: rotate(160deg);
   }
 
-  /* line 249, ../sass/_estilos.scss */
+  /* line 251, ../sass/_estilos.scss */
   50% {
     -webkit-transform: rotate(0deg);
   }
 
-  /* line 253, ../sass/_estilos.scss */
+  /* line 255, ../sass/_estilos.scss */
   75% {
     -webkit-transform: rotate(160deg);
   }
 
-  /* line 257, ../sass/_estilos.scss */
+  /* line 259, ../sass/_estilos.scss */
   100% {
     -webkit-transform: rotate(0deg);
   }
 }
 
 @keyframes loading {
-  /* line 263, ../sass/_estilos.scss */
+  /* line 265, ../sass/_estilos.scss */
   0% {
     transform: rotate(0deg);
   }
 
-  /* line 267, ../sass/_estilos.scss */
+  /* line 269, ../sass/_estilos.scss */
   25% {
     transform: rotate(160deg);
   }
 
-  /* line 271, ../sass/_estilos.scss */
+  /* line 273, ../sass/_estilos.scss */
   50% {
     transform: rotate(0deg);
   }
 
-  /* line 275, ../sass/_estilos.scss */
+  /* line 277, ../sass/_estilos.scss */
   75% {
     transform: rotate(160deg);
   }
 
-  /* line 279, ../sass/_estilos.scss */
+  /* line 281, ../sass/_estilos.scss */
   100% {
     transform: rotate(0deg);
   }
 }
 
-/* line 284, ../sass/_estilos.scss */
+/* line 286, ../sass/_estilos.scss */
 .content-loader {
   margin: auto;
   margin-top: 20%;
 }
 
-/* line 289, ../sass/_estilos.scss */
+/* line 291, ../sass/_estilos.scss */
 .loading {
   background-color: transparent;
   border-radius: 50%;
@@ -398,7 +401,7 @@ div#loader {
   animation: loading 5s infinite linear;
 }
 
-/* line 297, ../sass/_estilos.scss */
+/* line 299, ../sass/_estilos.scss */
 .spin-1 {
   border: 5px solid #c00353;
   border-top: 5px solid transparent;
@@ -407,7 +410,7 @@ div#loader {
   height: 120px;
 }
 
-/* line 305, ../sass/_estilos.scss */
+/* line 307, ../sass/_estilos.scss */
 .spin-2 {
   border: 5px solid #05bbc3;
   border-top: 5px solid transparent;
@@ -418,7 +421,7 @@ div#loader {
   animation-delay: 0.1s;
 }
 
-/* line 315, ../sass/_estilos.scss */
+/* line 317, ../sass/_estilos.scss */
 .spin-3 {
   border: 5px solid #d2d947;
   border-top: 5px solid transparent;
@@ -429,7 +432,7 @@ div#loader {
   animation-delay: 0.1s;
 }
 
-/* line 325, ../sass/_estilos.scss */
+/* line 327, ../sass/_estilos.scss */
 .spin-4 {
   border: 5px solid #f2a342;
   border-top: 5px solid transparent;
@@ -440,7 +443,7 @@ div#loader {
   animation-delay: 0.1s;
 }
 
-/* line 335, ../sass/_estilos.scss */
+/* line 337, ../sass/_estilos.scss */
 .spin-5 {
   border: 5px solid #f34d51;
   border-top: 5px solid transparent;
@@ -451,7 +454,7 @@ div#loader {
   animation-delay: 0.1s;
 }
 
-/* line 345, ../sass/_estilos.scss */
+/* line 347, ../sass/_estilos.scss */
 .spin-6 {
   border: 5px solid white;
   width: 20px;
