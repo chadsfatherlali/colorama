@@ -1,6 +1,10 @@
 <?
 if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
-     $nombrejs = $_GET["portal"] . "/" . $_GET["objetojson"];
+
+     $nombrejs = (isset($_GET["carpeta"]) && $_GET["carpeta"] != "undefined")
+     ? $_GET["portal"] . "/" . $_GET["carpeta"] . "/" . $_GET["objetojson"]
+     : $_GET["portal"] . "/" . $_GET["objetojson"];
+
      $datos = file_get_contents("https://b2c-docs.s3.amazonaws.com/colorama_landings/" . $nombrejs . ".js");
      $datosNombre = json_decode($datos, true);
 
@@ -39,7 +43,7 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
                break;
 
                case "borrar":
-                    $result = $s3h->delete_skin($get["portal_id"], $get["skin_name"]);
+                    $result = $s3h->delete_skin($get["portal_id"], $get["skin_folder"], $get["skin_name"]);
                     echo json_encode($result);
                break;
 
@@ -52,10 +56,19 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
                     $result = $s3h->delete_bucket_obj($get["portal_borrar"]);
                     echo json_encode($result);                              
                break;
+
+               case "comprobarcarpetasskin":
+                    $result = $s3h->comprobar_carpeta($get);
+                    echo json_encode($result);
+               break;
+
+               case "updateorcreate":
+                    $result = $s3h->updateorcreate_carpeta($get);
+                    echo json_encode($result);
+               break;
           }
      }else{
-          $result = $s3h->upload_generate_json($datos);
-          
+          $result = $s3h->upload_generate_json($datos);          
           echo json_encode($result);
      }
 }

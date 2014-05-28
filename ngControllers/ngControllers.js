@@ -4,21 +4,24 @@ var _controllers_ = angular.module("_controllers_", []);
  * Controlador principal de la aplicación;
  */
 _controllers_.controller("mainController", function($rootScope, $scope, $window, $http, $routeParams, $location, $sce, $compile) {
+     $scope.permitirreescribir = false;
      $scope.permitidoBorrar = false;
      $scope.permitidoDescargar = false;
      $scope.menudesplegado = false;
      $scope.pais = "espana";
      $scope.Skins = [];
-     $rootScope.listo = false;
+     $scope.Landings = [];
+     $scope.land_skin_folder = [];
      $scope.Mcolorama = {};
      $scope.portalDuplicar = {};
      $scope.portalBorrar = {};
-     $scope.envioDatos = true;
-     $rootScope.rootImg = null;
+     $scope.envioDatos = true;     
      $scope.Portales = $window.Portales;
      $scope.AllSkins = $window.AllSkins["objetos"];
+     $scope.AllLandings = $window.AllLandings;
      $scope.BucketLlenos = $window.BucketsConContenido["full"];
      $scope.BucketVacios = $window.BucketsConContenido["empty"];     
+     $scope.CarpetaContenedoraDeSkins = [];
      $scope.cartasPago = [
           {
                nombre: "España",
@@ -30,11 +33,20 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
           }
      ];
 
+     $rootScope.Carpetas = false;
+     $rootScope.listo = false;
+     $rootScope.rootImg = null;
+
+     /**No olvidar borrar**/
+     // $scope.Portales[0].w_etiqueta_webiste = "skin1, skin2, skin3";
+     // $scope.Portales[1].w_etiqueta_webiste = "skin1, skin2, skin3, skin4";
+     /**No olvidar borrar**/
+
      $scope.cartaPago = $scope.cartasPago[0];
 
      $rootScope.$watch(function() {
           $scope.Mcolorama.dummyimg_backgroundimageanimated = $rootScope.rootName;
-          $scope.Mcolorama.dummyimg_backgroundimage = $rootScope.rootImg;
+          $scope.Mcolorama.dummyimg_backgroundimage = $rootScope.rootImg;     
      });
 
      /**
@@ -42,9 +54,9 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
       * @return {[null]} 
       */
      $scope.descargarSkin = function() {
-          if($scope.Mcolorama.dummylayer_null) window.open("json.php?objetojson=" + $scope.Mcolorama.dummylayer_null + "&portal=" + $scope.Mcolorama.dummy_portal + "&render=2", "_blank", "width=500,height=10,left=500,top=0");
+          if($scope.Mcolorama.dummylayer_null) window.open("json.php?objetojson=" + $scope.Mcolorama.dummylayer_null + "&portal=" + $scope.Mcolorama.dummy_portal + "&carpeta=" + $scope.Mcolorama.dummy_skinfolder + "&render=2", "_blank", "width=500,height=10,left=500,top=0");
 
-          window.open("json.php?objetojson=" + $scope.Mcolorama.dummynombre_null + "&portal=" + $scope.Mcolorama.dummy_portal + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
+          window.open("json.php?objetojson=" + $scope.Mcolorama.dummynombre_null + "&portal=" + $scope.Mcolorama.dummy_portal + "&carpeta=" + $scope.Mcolorama.dummy_skinfolder + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
      }
   
 
@@ -57,6 +69,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
 
           $http.post("json.php", {
                portal_id: $scope.Mcolorama.dummy_portal,
+               skin_folder: $scope.Mcolorama.dummy_skinfolder, 
                skin_name: $scope.Mcolorama.dummynombre_null,
                accion: "borrar"
           })
@@ -66,14 +79,12 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
 
                     angular.forEach($scope.Skins, function(value, key) {
                          if(value == $scope.Mcolorama.dummy_portal + " - " + $scope.Mcolorama.dummynombre_null + ".js") {
-                              console.log(key);
                               $scope.Skins.splice(key, 1);
                          }
                     });
 
                     angular.forEach($scope.AllSkins, function(value, key) {
                          if(value == $scope.Mcolorama.dummy_portal + " - " + $scope.Mcolorama.dummynombre_null + ".js") {
-                              console.log(key);
                               $scope.AllSkins.splice(key, 1);
                          }
                     });
@@ -124,6 +135,61 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
      $scope.setCartaPago = function() {
           $scope.pais = $scope.cartaPago.vista;
           $location.path($scope.cartaPago.vista);
+     }
+
+
+     $scope.formularioAltaSkinfolder = function($scope) {       
+          $scope.currentPortalLandings = []; 
+
+          // $scope.getLandings = function() {
+          //      $scope.currentPortalLandings = [];
+
+          //      angular.forEach($scope.AllLandings[$scope.skinfoldersAdd.website.w_id], function(v, k) {
+          //           $scope.currentPortalLandings.push(v);
+          //      });
+          // }
+
+          $scope.comprobateSkinsFolders = function() {
+               // w_alias: "Infotel"
+               // w_etiqueta_webiste: "Infotel"
+               // w_id: "infotel255f287ca47c42cacdedf92bb"
+               // w_nombre: "Infotel11847"
+               // w_ts_modificacion: "2014-05-27 16:43:31"
+               // w_url_landings: null
+               $scope.skinfoldersAdd.folders = null;
+
+               $http.post("json.php", {
+                    wid: $scope.skinfoldersAdd.website.w_id,
+                    accion: "comprobarcarpetasskin"
+               })
+               .success(function(data, status, headers, config) {
+                    if(data["success"]) {
+                         $scope.skinfoldersAdd.folders = data["objeto"][0].skin_folders;
+                    } else {
+                         alert("La landing no tiene ninguna carpeta asociada para los Skins");
+                    }
+               })
+               .error(function(data, status, headers, config) {
+                    try{console.log("ERROR:", data)}catch(err) {};
+               });
+          }
+
+          $scope.sendadd = function() {
+               $http.post("json.php", {
+                    objeto: $scope.skinfoldersAdd,
+                    accion: "updateorcreate"
+               })
+               .success(function(data, status, headers, config) {
+                    if(data["success"]) {
+                         alert("Actualización de carpetas completada.")
+                    } else {
+                         alert("Se ha producido un error");
+                    }
+               })
+               .error(function(data, status, headers, config) {
+                    try{console.log("ERROR:", data)}catch(err) {};
+               });
+          }
      }
 
 
@@ -220,7 +286,6 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
       * @return {[objeto]}
       */
      $scope.formularioColorama = function($scope, enviarImg) {
-          $scope.optionsLandings = $scope.Landings;
           $scope.imagen = null;               
           $scope.setValuesForm = false;
 
@@ -259,10 +324,12 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
                && $scope.formColorama.dummytexto_color.$dirty
                && $scope.formColorama.dummynombre_null.$dirty) {
 
-                    $http.post("json.php", Mcolorama)
-                    .success(function(data, status, headers, config) {
-                         console.log("DEV:", data);
+                    var datosok = ($scope.permitirreescribir)
+                    ? {cfg: Mcolorama, reescribir: true}
+                    : {cfg: Mcolorama, reescribir: false}; 
 
+                    $http.post("json.php", datosok)
+                    .success(function(data, status, headers, config) {
                          if(data["success"]) {
 
                               var nuevoSkin = data["objeto"]["dummy_portal"] + " - " + data["objeto"]["dummynombre_null"] + ".js";
@@ -277,9 +344,9 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
 
                               alert(texto);
                               
-                              if(data["objeto"]["dummylayer_null"]) window.open("json.php?objetojson=" + data["objeto"]["dummylayer_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=2", "_blank", "width=500,height=10,left=500,top=0");
+                              if(data["objeto"]["dummylayer_null"]) window.open("json.php?objetojson=" + data["objeto"]["dummylayer_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&carpeta=" + data["objeto"]["dummy_skinfolder"] + "&render=2", "_blank", "width=500,height=10,left=500,top=0");
 
-                              window.open("json.php?objetojson=" + data["objeto"]["dummynombre_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
+                              window.open("json.php?objetojson=" + data["objeto"]["dummynombre_null"] + "&portal=" + data["objeto"]["dummy_portal"] + "&carpeta=" + data["objeto"]["dummy_skinfolder"] + "&render=1", "_blank", "width=500,height=10,left=0,top=0");
 
                          } else if(!data["success"]
                          && data["detalle"] == "existe") {
@@ -327,6 +394,13 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
                $scope.Mcolorama = data;
                $rootScope.rootImg = $scope.Mcolorama.dummyimg_backgroundimage;
 
+               // angular.forEach($scope.Landings, function(v, k) {
+               //      if(v.land_id == data.dummy_landingid) {
+               //           $scope.landing = $scope.Landings[k];
+               //           $scope.setFolderSkins($scope.landing);
+               //      }
+               // });
+
                $scope.permitidoBorrar = true;
                $scope.permitidoDescargar = true;
                $rootScope.listo = false;
@@ -346,6 +420,8 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
       * @param  {[string]} id [id del portal selecto]
       */
      $scope.checkPortal = function(portal) {
+          $scope.land_skin_folder = [];
+          $scope.Landings = [];
           $rootScope.listo = true;
 
           $scope.Mcolorama.dummy_portal = portal.w_id;
@@ -359,6 +435,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
                     alert("Estan listos los SKIN solicitados");
                     
                     $scope.Skins = data["objetos"];
+                    
                } else {
                     alert("No existe el bucket (No tiene skins asociados...)");
                     
@@ -366,11 +443,37 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
                     $scope.Skins = [];
                }
 
+               if(data["folders"]) $scope.land_skin_folder = data["folders"].split(",");
+
                $rootScope.listo = false;
           })
           .error(function(data, status, headers, config) {
                $scope.permitidoBorrar = false;
                try{console.log("ERROR:", data)}catch(err) {};
           });
+     }
+
+
+     // $scope.setFolderSkins = function(landing) {
+     //      $scope.Mcolorama.dummy_landingid = landing.land_id;
+     //      landing.land_skin_folder = "skin1,skin2,skin3";
+
+     //      if(landing.land_skin_folder) {
+     //           $scope.land_skin_folder = landing.land_skin_folder.split(",");
+     //           angular.forEach($scope.land_skin_folder, function(v, k) {
+     //                $scope.land_skin_folder[k] = v.trim();
+     //           });
+     //      }
+     // }
+
+
+     /**
+      * [permitirReescribir establece un booleano que nos permite o no re-escribir una landing]
+      * @return {[boolean]}
+      */
+     $scope.permitirReescribir = function() {
+          $scope.permitirreescribir = ($scope.permitirreescribir)
+          ? false
+          : true;
      }
 });

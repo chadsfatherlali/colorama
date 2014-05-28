@@ -1,4 +1,11 @@
 <form name="formColorama" class="modulos" id="landings" ng-controller="formularioColorama">
+     <fieldset ng-if="land_skin_folder">
+          <legend>Carpeta a seleccionar los Skins:</legend>
+          <select name="dummy_skinfolderr" id="dummyinputskinfolder" ng-model="Mcolorama.dummy_skinfolder" chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge una la carpeta de los Skins" id="portalSelect" ng-model="Mcolorama.creatividad_asignada" ng-options="c for c in land_skin_folder" alfanumericos>
+               <option value=""></option>
+          </select>
+     </fieldset>
+     
      <fieldset>
           <legend>Color Background:</legend>
           <input name="dummy_backgroundcolor" id="dummyinput" ng-model="Mcolorama.dummy_backgroundcolor" colorpicker hexadecimal type="text" placeholder="Color Background" value="" />
@@ -34,12 +41,6 @@
           <input name="dummylayer_null" id="dummyinputlayer" ng-model="Mcolorama.dummylayer_null" type="text" numerico placeholder="Número del LAYER (opcional)" value="" />
      </fieldset>
 
-     <!-- <fieldset>
-          <legend>Asignar a creatividad (opcional):</legend>
-          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge una creatividad" id="portalSelect" ng-model="Mcolorama.creatividad_asignada" ng-options="(l.id + ' -- ' + l.nombre + ' -- ' + l.ruta) for l in Landings">
-               <option value=""></option>
-          </select>
-     </fieldset> -->
-
-     <button id="generar-y-guardar" ng-click="gd(Mcolorama)" ng-if="envioDatos">Generar y Descargar</button>
+     <button id="generar-y-guardar" ng-click="gd(Mcolorama)" ng-if="envioDatos">Generar y Descargar</button> 
+     <div><input ng-click="permitirReescribir()" ng-model="permitirreescribir" name="permitirRescribir" type="checkbox"/> <span>Permitir re-escribir</span></div>
 </form>

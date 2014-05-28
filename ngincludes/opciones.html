@@ -24,3 +24,23 @@
      
      <button id="borrar-buckets" ng-click="borrar(portalBorrar)">Borrar Bucket</button>
 </form>
+
+<form name="formAltaSkinfolder" class="modulos" id="AltaSkinfolder" ng-controller="formularioAltaSkinfolder">
+     <fieldset>
+          <legend>Alta Skinfolder:</legend>
+          <h3>Escoge el website</h3>
+          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge el portal" id="checkSkinFolder" name="checkskinfolder" ng-model="skinfoldersAdd.website" ng-change="comprobateSkinsFolders()" ng-options="(p.w_alias + ' -- ' + p.w_id) for p in Portales">
+               <option value=""></option>
+          </select>
+
+          <!-- <h3>Escoge la landing</h3>
+          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge la landing" id="updateSkinFolder" name="updateskinfolder" ng-model="skinfoldersAdd.landings" ng-change="comprobateSkinsFolders()" ng-options="(cpl.land_id + ' -- ' + cpl.land_nombre) for cpl in currentPortalLandings">
+               <option value=""></option>
+          </select> -->
+
+          <h3>Añade las carpetas para los skins separados por una ","</h3>
+          <input type="text" name="skinfoldersadd" id="skinfoldersadd" ng-model="skinfoldersAdd.folders" placeholder="ej: skin1,skin2">
+     </fieldset>
+
+     <button id="add-skinsfolders" ng-click="sendadd()">Actualizar Carpetas</button>
+</form>

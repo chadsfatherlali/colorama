@@ -1,11 +1,6 @@
 <? 
 include "s3helper.php";
 
-$portales = $s3h->get_mobile_web_sites();
-$allskins = $s3h->get_all_files_json();
-$buckets = $s3h->get_buckets_used_and_unused();
-//$landings = $s3h->get_creatividades();
-
 $s3h->minifyHTML("inicio");
 ?>
 
@@ -34,11 +29,7 @@ $s3h->minifyHTML("inicio");
      <script type="text/javascript" src="ngFactories/ngFactories.js"></script>
      <script type="text/javascript" src="ngControllers/ngControllers.js"></script>
      
-     <script>          
-          window.Portales = <? echo json_encode($portales) ?>;
-          window.AllSkins = <? echo json_encode($allskins) ?>;
-          window.BucketsConContenido = <? echo json_encode($buckets) ?>;
-     </script>
+     <script type="text/javascript" src="var.js.php"></script>
 
      <script>
           (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -51,7 +42,6 @@ $s3h->minifyHTML("inicio");
      </script>
 </head>
 <body ng-controller="mainController">
-     
      <div id="loader" ng-if="listo" ng-include="'ngincludes/loader.html'"></div>
 
      <header ng-class="{menudesplegado: menudesplegado == true}">
@@ -65,13 +55,18 @@ $s3h->minifyHTML("inicio");
                <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Portal" id="portalSelect" ng-model="portal" ng-change="checkPortal(portal)" ng-options="(p.w_alias + ' -- ' + p.w_id) for p in Portales">
                     <option value=""></option>
                </select>
+               
+               <!-- <h3>Landings Asociadas:</h3>
+               <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge una landing" id="landingSelect" ng-model="landing" ng-change="setFolderSkins(landing)" ng-options="(l.land_id + ' -- ' + l.land_nombre ) for l in Landings">
+                    <option value=""></option>
+               </select> -->
 
                <h3>Skins disponibles:</h3>
                <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" id="skinsSelect" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in Skins">
                     <option value=""></option>
                </select>
 
-               <span class="replica" ng-if="Mcolorama.replica"><strong>REPLICA:</strong> {{Mcolorama.replica}}</span>
+               <div class="replica" ng-if="Mcolorama.replica"><strong>REPLICA:</strong> {{Mcolorama.replica}}</div>
           </div>
           
           <div ng-include="'ngincludes/formularioprincipal.html'"></div>
@@ -96,7 +91,7 @@ $s3h->minifyHTML("inicio");
                <div class="modulos" id="modulo-json">
                     <fieldset>
                          <legend>Dummy JSON:</legend>
-                         <p>{{Mcolorama | json}}</p>
+                         <p>{{Mcolorama|json}}</p>
                     </fieldset>
                </div>
           </div>

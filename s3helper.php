@@ -9,6 +9,7 @@ class s3helper extends AmazonS3 {
      private $bucketname = "b2c-docs";
      private $portales_mobile;
      private $portales_result;
+     private $db;
 
 
      /**
@@ -18,12 +19,13 @@ class s3helper extends AmazonS3 {
           parent::__construct();
 
           $sql = "SELECT w.web_id AS w_id,
-          w.web_url AS w_url,
+          -- w.web_url AS w_url,
           w.web_nombre AS w_nombre,
           w.web_ts_modificacion AS w_ts_modificacion,
           w.web_alias AS w_alias,
-          w.web_product_tag AS w_product_tag,
-          w.web_usuario_modifica AS w_usuario,
+          -- w.web_product_tag AS w_product_tag,
+          -- w.web_usuario_modifica AS w_usuario,
+          w.web_etiqueta_website AS w_etiqueta_webiste,
           cf.cfc_cname AS w_url_landings
           FROM argo_websites w
           LEFT JOIN b2c.b2c_cloudfront_config cf ON cfc_id=web_cloudfront_cfc_id
@@ -31,6 +33,8 @@ class s3helper extends AmazonS3 {
           ORDER BY w_ts_modificacion DESC";
 
           $this->portales_result = db::query("argo", $sql, array());
+          //$this->db = new SQLite3("colorama");
+          $this->db = new PDO("sqlite:../../../../proyecto_ssanchez/trunk/dptografico/colorama/colorama");
      }
 
 
@@ -98,7 +102,7 @@ class s3helper extends AmazonS3 {
           $bucketslimpios = preg_replace_callback("/[0-9A-z]+.js/", function($matches) {
                null;
           }, $match);
-          
+
           $bucketslimpios = preg_replace_callback("/colorama_landings/", function($matches) {
                null;
           }, $bucketslimpios);
@@ -113,11 +117,15 @@ class s3helper extends AmazonS3 {
           $bucketstatus["empty"] = array_diff($portalesusados, $bucketslimpios);
 
           foreach ($bucketstatus["full"] as $key => $value) {
-               $bucketstatus["full"][$key] = $portalesalias[$value] . " -- " . $value;
+               if(@$portalesalias[$value]) {
+                    $bucketstatus["full"][$key] = $portalesalias[$value] . " -- " . $value;
+               }
           }
 
           foreach ($bucketstatus["empty"] as $key => $value) {
-               $bucketstatus["empty"][$key] = $portalesalias[$value] . " -- " . $value;
+               if(@$portalesalias[$value]) {
+                    $bucketstatus["empty"][$key] = $portalesalias[$value] . " -- " . $value;
+               }
           }
 
           return $bucketstatus;
@@ -223,6 +231,7 @@ class s3helper extends AmazonS3 {
       * @return [array] [nombres de los json de los skins]
       */
      public function get_files_json($carpeta = null) {
+          $wid = $carpeta;
           $response = array();
           $patron = "/[a-zA-Z0-9].js/i";          
           $carpeta = ($carpeta)? "colorama_landings/" . $carpeta . "/" : "/colorama_landings/";
@@ -246,6 +255,14 @@ class s3helper extends AmazonS3 {
           }else{
                $response["success"] = false;
           }
+          
+          $sql = "select * from altaskinsfolders where id_portal = '$wid'";
+
+          $estado = $this->db->prepare($sql);
+          $estado->execute();
+
+          $result = $estado->fetchAll();
+          $response["folders"] = ($result)? $result[0]["skin_folders"] : null;
 
           return $response;
      }
@@ -270,8 +287,10 @@ class s3helper extends AmazonS3 {
       * @param  [string] $skin   [nombre del skin]
       * @return [array]
       */
-     public function delete_skin($portal, $skin) {
-          $objeto = "colorama_landings/". $portal . "/" . $skin . ".js";
+     public function delete_skin($portal, $folder, $skin) {
+          $objeto = ($folder)
+          ? "colorama_landings/". $portal . "/" . $folder . "/" . $skin . ".js"
+          : "colorama_landings/". $portal . "/" . $skin . ".js";
           $result = $this->delete_object($this->bucketname, $objeto);
 
           return $result->isOK();
@@ -286,26 +305,31 @@ class s3helper extends AmazonS3 {
      public function upload_generate_json($datos) {
           $replica = null;
           $datos = json_decode($datos, true);
-          $carpeta = "colorama_landings/" . $datos["dummy_portal"] . "/";
 
-          @$existePorNumero = $this->if_object_exists($this->bucketname, $carpeta . $datos["dummylayer_null"] . ".js");
-          @$existePorNombre = $this->if_object_exists($this->bucketname, $carpeta . $datos["dummynombre_null"] . ".js");
+          $carpeta = (isset($datos["cfg"]["dummy_skinfolder"]) && $datos["cfg"]["dummy_skinfolder"])
+          ? "colorama_landings/" . $datos["cfg"]["dummy_portal"] . "/" . $datos["cfg"]["dummy_skinfolder"] . "/"
+          : "colorama_landings/" . $datos["cfg"]["dummy_portal"] . "/";
 
-          if($existePorNumero 
-          || $existePorNombre) {
+          if(!$datos["reescribir"]) {
+               @$existePorNumero = $this->if_object_exists($this->bucketname, $carpeta . $datos["cfg"]["dummylayer_null"] . ".js");
+               @$existePorNombre = $this->if_object_exists($this->bucketname, $carpeta . $datos["cfg"]["dummynombre_null"] . ".js");
 
-               $response["success"] = false;
-               $response["detalle"] = "existe";
+               if($existePorNumero 
+               || $existePorNombre) {
 
-               return $response;
+                    $response["success"] = false;
+                    $response["detalle"] = "existe";
+
+                    return $response;
+               }
           }
 
-          if(isset($datos["dummylayer_null"])) {
-               $replica = $datos["dummylayer_null"] . "===" . $datos["dummynombre_null"];
-               $datos["replica"] = $replica;
+          if(isset($datos["cfg"]["dummylayer_null"])) {
+               $replica = $datos["cfg"]["dummylayer_null"] . "===" . $datos["cfg"]["dummynombre_null"];
+               $datos["cfg"]["replica"] = $replica;
 
-               $result = $this->create_object($this->bucketname, $carpeta . $datos["dummylayer_null"] . ".js", array(
-                    "body"                   => json_encode($datos),
+               $result = $this->create_object($this->bucketname, $carpeta . $datos["cfg"]["dummylayer_null"] . ".js", array(
+                    "body"                   => json_encode($datos["cfg"]),
                     "acl"                    => AmazonS3::ACL_PUBLIC,
                     "contentType"            => "application/javascript",
                     "headers"                => array(
@@ -315,8 +339,8 @@ class s3helper extends AmazonS3 {
                ));
           }
 
-          $result = $this->create_object($this->bucketname, $carpeta . $datos["dummynombre_null"] . ".js", array(
-               "body"                   => json_encode($datos),  
+          $result = $this->create_object($this->bucketname, $carpeta . $datos["cfg"]["dummynombre_null"] . ".js", array(
+               "body"                   => json_encode($datos["cfg"]),  
                "acl"                    => AmazonS3::ACL_PUBLIC,
                "contentType"            => "application/javascript",
                "headers"                => array(
@@ -327,11 +351,11 @@ class s3helper extends AmazonS3 {
 
           if($result) {
                $response["success"] = true;
-               $response["objeto"] = $datos;
+               $response["objeto"] = $datos["cfg"];
           }else{
                $response["success"] = false;
           }
-          
+
           return $response; 
      }
 
@@ -348,19 +372,75 @@ class s3helper extends AmazonS3 {
           return $this->portales_mobile;
      }
 
+     /**
+      * [get_landings obtiene todas las landings publicadas.]
+      * @return [array] 
+      */
+     public function get_landings() {
+          $landings = array();
+          $sql = "select land_id,
+          land_creatividad,
+          land_nombre,
+          land_argo_website,
+          land_skin_folder
+          from landings";          
 
-     public function get_creatividades() {
-          $sql = "select * from landings_creatividades";
           $response = db::query("b2c", $sql, array());
-          $creatividades = array();
-          
+
           foreach ($response as $key => $value) {
-               $creatividades[$key]["nombre"] = $value["plan_nombre"];
-               $creatividades[$key]["ruta"] = $value["plan_uri"];
-               $creatividades[$key]["id"] = $value["plan_id"];
+               $landings[$value["land_argo_website"]][$key] = $value;
           }
 
-          return $creatividades;
+          return $landings;
+     }
+
+
+     public function comprobar_carpeta($obj) {
+          $wid = $obj["wid"];
+          
+          $sql = "select * from altaskinsfolders where id_portal = '$wid'";
+
+          $estado = $this->db->prepare($sql);
+          $estado->execute();
+
+          $result = $estado->fetchAll();
+
+          if($result) {
+               $response["success"] = true;
+               $response["objeto"] = $result;
+          }else{
+               $response["success"] = false;
+          }
+
+          return $response;
+     }
+
+
+     public function updateorcreate_carpeta($obj) {
+          $wid = $obj["objeto"]["website"]["w_id"];
+          $lfs = $obj["objeto"]["folders"];
+
+          $sql = "select * from alta_skinsfolders where id_portal = '$wid'";
+
+          $estado = $this->db->prepare($sql);
+          $estado->execute();
+
+          $result = $estado->fetchAll();
+
+          $sql = ($result)
+          ? "update altaskinsfolders set skin_folders = '$lfs' where id_portal = '$wid'"
+          : "insert into altaskinsfolders (skin_folders, id_portal) values ('$lfs', '$wid')";
+
+          $estado = $this->db->prepare($sql);
+          
+          if($estado->execute()) {
+               $response["success"] = true;
+          }else{
+               $response["success"] = false;
+               $response["error"] = $estado->errorCode();
+          };
+
+          return $response;
      }
 }
 
