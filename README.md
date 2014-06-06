@@ -1,5 +1,7 @@
-COLORAMA LANDINGS
-=================
+COLORAMA LANDINGS:
+==================
+***
+***
 
 ###Colorama panel configuración del skin:
 
