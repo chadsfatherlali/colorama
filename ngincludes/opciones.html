@@ -1,29 +1,32 @@
-<form name="formS3clonar" class="modulos" id="S3clonar" ng-controller="formularioS3clonar">
-     <fieldset>
-          <legend>Clonar Bucket:</legend>
-          <h3>Bucket Origen:</h3>
-          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge el bucket de origen" id="portalSelectOrigen" name="origen" ng-model="portalDuplicar.origen" ng-options="v as v for (k, v) in BucketLlenos">
-               <option value=""></option>
-          </select>
-          <h3>Bucket Destino:</h3>
-          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge el bucket de destino" id="portalSelectDestino" name="destino" ng-model="portalDuplicar.destino" ng-options="v as v for (k, v) in BucketVacios">
-               <option value=""></option>
-          </select>
-     </fieldset>
-     
-     <button id="duplicar-buckets" ng-click="duplicar(portalDuplicar)">Duplicar Bucket</button>
-</form>
+<div class="modulos tree">
+     <legend>Árbol origen:</legend>
+     <div class="tree-selector-origen">
+          <abn-tree tree-data="my_data_origen" tree-control="my_tree_origen" on-select="my_tree_origen_handler(branch)" expand-level="0"></abn-tree>
+     </div>
+</div>
 
-<form name="formS3borrar" class="modulos" id="S3borrar" ng-controller="formularioS3borrar">
-     <fieldset>
-          <legend>Borrar Bucket:</legend>
-          <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge el bucket a borrar" id="portalSelectBorrar" name="portalaborrar" ng-model="portalBorrar.portalaborrar" ng-options="v as v for (k, v) in BucketLlenos">
-               <option value=""></option>
-          </select>
-     </fieldset>
+<div class="modulos tree">
+     <legend>Árbol destino:</legend>
+     <div class="tree-selector-destino">
+          <abn-tree tree-data="my_data_destino" tree-control="my_tree_destino" on-select="my_tree_destino_handler(branch)" expand-level="0"></abn-tree>
+     </div>
+</div>
+
+<div class="modulos acciones-tree">
+     <legend>Ramas:</legend>
+
+     <h3>Rama origen:</h3>
+     <p class="caminos caminos-origen">{{seleccionado1}}</p>
      
-     <button id="borrar-buckets" ng-click="borrar(portalBorrar)">Borrar Bucket</button>
-</form>
+     <h3>Rama destino:</h3>
+     <p class="caminos caminos-destino">{{seleccionado2}}</p>
+
+     <fieldset class="contenedor-opciones-botones">
+          <legend>Acciones:</legend>
+          <button id="copiar-buckets-opciones" ng-click="copiarRama()">Copiar Rama</button>
+          <button id="borrar-buckets-opciones" ng-click="borrarRama()">Borrar Rama (Origen)</button>
+     </fieldset>
+</div>
 
 <form name="formAltaSkinfolder" class="modulos" id="AltaSkinfolder" ng-controller="formularioAltaSkinfolder">
      <fieldset>

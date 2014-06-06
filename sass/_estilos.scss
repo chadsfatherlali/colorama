@@ -1,4 +1,7 @@
 $colorazul: #05A7ED;
+$colorrojo: #D94C36;
+$coloramarillo: #FFDA6B;
+$colorverde: #85B340;
 
 *{
      -webkit-box-sizing: border-box;
@@ -23,6 +26,7 @@ input[type="text"]{
 }
 
 button{
+     outline: 0 !important;
      border: 0;
      background: $colorazul;
      color: white;
@@ -47,7 +51,7 @@ legend{
      text-align: left;
      margin-bottom: 1em;
      font-weight: bold;
-     border-bottom: 1px solid $colorazul;
+     border-bottom: 3px solid $colorazul;
      padding-bottom: 0.2em;
 }
 
@@ -71,7 +75,7 @@ header{
      height: 90%;
      z-index: 9998;
      background: white;
-     box-shadow: 0 4px 2px -2px gray;
+     box-shadow: 0 4px 2px -2px $colorazul;
      -webkit-transform: translate(0%, -100%);
      -moz-transform: translate(0%, -100%);
      -ms-transform: translate(0%, -100%);
@@ -96,6 +100,39 @@ header{
           width: 100%;
           height: 100%;
           overflow-y: auto;
+          div.modulos.tree{
+               width: 25%;
+               height: 75%;
+               overflow: hidden;
+               div{
+                    height: 95%;
+                    overflow-y: auto;
+                    &.tree-selector-origen{
+                         .nav-pills > li.active > a{
+                              background-color: $colorverde;
+                              color: black;
+                         }
+                    }
+                    &.tree-selector-destino{
+                         .nav-pills > li.active > a{
+                              background-color: $coloramarillo;
+                              color: black;
+                         }
+
+                    } 
+               }
+               legend{
+                    border-bottom: 3px solid $colorverde !important;
+               }
+               &:nth-child(2){
+                    legend{
+                         border-bottom: 3px solid $coloramarillo !important;
+                    }    
+               }
+               ul.abn-tree i.indented{
+                    color: black !important;
+               }
+          }
           div#portalSelectOrigen_chosen{
                width: 100% !important;
           }
@@ -104,7 +141,44 @@ header{
                     width: 100% !important;
                }
           }
-          
+          div.acciones-tree{
+               p.caminos{
+                    -webkit-border-radius: 10px;
+                    -moz-border-radius: 10px;
+                    border-radius: 10px;
+                    text-align: center;
+                    padding: 1em;
+                    margin-top: 0.5em;
+                    &.caminos-origen{
+                         background: $colorverde;
+                    }
+                    &.caminos-destino{
+                         background: $coloramarillo;
+                    }
+               }
+               fieldset.contenedor-opciones-botones{
+                    margin-top: 3em;
+                    legend{
+                         margin-bottom: 0 !important;
+                    }
+                    button#copiar-buckets-opciones{
+                         border-color: $colorverde !important;
+                         background: $colorverde !important;
+                         &:hover{
+                              background: white !important;
+                              color: $colorverde;
+                         }
+                    }
+                    button#borrar-buckets-opciones{
+                         border-color: $colorrojo !important;
+                         background: $colorrojo !important;
+                         &:hover{
+                              background: white !important;
+                              color: $colorrojo;
+                         }
+                    }
+               }
+          }          
      }
      a#menu{
           position: absolute;
@@ -127,7 +201,7 @@ header{
 
 .modulos{
      padding: 2em;
-     border: 1px dotted grey;
+     border: 1px dotted $colorazul;
      float: left;
      margin: 1em;
 }
@@ -140,7 +214,6 @@ div#wrapper{
 
 div.formularioHeader{
      padding: 2em;
-     border: 1px dotted grey;
      float: inherit !important;
      div#portalSelect_chosen{
           width: 100% !important;
@@ -154,7 +227,7 @@ div.formularioHeader{
      div.replica{
           margin-top: 0.5em;
           padding: 0.5em;
-          width: 16%;
+          width: 20%;
           text-align: center;
           border: 1px solid $colorazul;
           strong{
@@ -191,29 +264,32 @@ div#modulo-dummy{
      fieldset{
           margin-top: 1em;
           button#borrarSkin{
-               background: #D94C36;
-               border-color: #D94C36;
+               background: $colorrojo;
+               border-color: $colorrojo;
                &:hover{
                     background: white;
-                    color: #D94C36;
+                    color: $colorrojo;
                }
           }
           button#descargarIMG{
-               background: #FFDA6B;
-               border-color: #FFDA6B;
+               background: $coloramarillo;
+               border-color: $coloramarillo;
                color: black;
                &:hover{
                     background: white;
-                    color: #FFDA6B;
+                    color: $coloramarillo;
                }
           }
           button#descargarSkin{
-               background: #85B340;
-               border-color: #85B340;
+               background: $colorverde;
+               border-color: $colorverde;
                &:hover{
                     background: white;
-                    color: #85B340;
+                    color: $colorverde;
                }
+          }
+          div#todoslosskindisponibles_chosen{
+               width: 100% !important;
           }
      }
 }
@@ -242,7 +318,7 @@ div#dummy{
           background-position: center;
           width: 100%;
           height: 240px;
-          background-size: cover;
+          background-size: 100% 100%;
           border-bottom: 1px dotted grey;
           -webkit-border-top-left-radius: 10px;
           -webkit-border-top-right-radius: 10px;

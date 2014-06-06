@@ -7,9 +7,21 @@ include_once "lib/resource.php";
 
 class s3helper extends AmazonS3 {
      private $bucketname = "b2c-docs";
+     private $carpetabase = "colorama_landings";
      private $portales_mobile;
      private $portales_result;
+     private $bucketsimplantar;
      private $db;
+     private $patrones = array(
+          "/colorama_landings\/([A-z0-9-_]+)\//",
+          "/([A-z0-9_-]+\.js)/",
+          "/(.*)+\//",
+          "/colorama_landings\/([A-z0-9-_\/]+)\//",
+          "/colorama_landings\/[A-z0-9-_\/]+\/[A-z0-9-_.]+/",
+          "/^colorama_landings\/[A-z0-9-_]+\/$/",
+          "/colorama_landings\/[A-z0-9-_]+\/[A-z0-9-_]+\//",
+          "/colorama_landings\/[A-z0-9-_]+\//",
+     );
 
 
      /**
@@ -19,12 +31,9 @@ class s3helper extends AmazonS3 {
           parent::__construct();
 
           $sql = "SELECT w.web_id AS w_id,
-          -- w.web_url AS w_url,
           w.web_nombre AS w_nombre,
           w.web_ts_modificacion AS w_ts_modificacion,
           w.web_alias AS w_alias,
-          -- w.web_product_tag AS w_product_tag,
-          -- w.web_usuario_modifica AS w_usuario,
           w.web_etiqueta_website AS w_etiqueta_webiste,
           cf.cfc_cname AS w_url_landings
           FROM argo_websites w
@@ -33,7 +42,6 @@ class s3helper extends AmazonS3 {
           ORDER BY w_ts_modificacion DESC";
 
           $this->portales_result = db::query("argo", $sql, array());
-          //$this->db = new SQLite3("colorama");
           $this->db = new PDO("sqlite:../../../../proyecto_ssanchez/trunk/dptografico/colorama/colorama");
      }
 
@@ -123,6 +131,11 @@ class s3helper extends AmazonS3 {
           }
 
           foreach ($bucketstatus["empty"] as $key => $value) {
+               $this->bucketsimplantar[] = array(
+                    "label" => $value,
+                    "ruta" => "colorama_landings/" . $value,
+               );
+
                if(@$portalesalias[$value]) {
                     $bucketstatus["empty"][$key] = $portalesalias[$value] . " -- " . $value;
                }
@@ -133,43 +146,151 @@ class s3helper extends AmazonS3 {
 
 
      /**
-      * [duplicate_buckets Función que duplica los archivos de un bucket a otro]
-      * @param  [string] $origen  [id del bucket de origen]
-      * @param  [string] $destino [id del bucket de destino]
-      * @return [null]
+      * [duplicate_buckets Función que nos permite operaciones de copia con los buckets]
+      * @param  [array] $obj [objeto con toda la información del los archivos, buckets o directorios]
+      * @return [array]
       */
-     public function duplicate_buckets($origen, $destino) {
-          $result = $this->get_files_json($origen);
+     public function duplicate_buckets($obj) {
+          $origen = $obj["objeto"]["origen"];
+          $destino = $obj["objeto"]["destino"];
+          $idOrigen = explode("/", $origen);
+          $idDestino = explode("/", $destino);
+          $idOrigen = $idOrigen[1];
+          $idDestino = $idDestino[1];
 
-          if($result["success"]) {
-               foreach ($result["objetos"] as $value) {
-                    list($bucket, $js) = explode(" - ", $value);
+          /**
+           * Copia de carpeta a carpeta
+           */
+          if(!preg_match($this->patrones[1], $origen)
+          && !preg_match($this->patrones[1], $destino)) {
+               $result = $this->get_files_json($origen, false);
 
-                    $archivo = $this->get_object($this->bucketname, "colorama_landings/" . $bucket . "/". $js);
-                    $nuevoobjeto = str_replace($origen, $destino, $archivo->body);
+               if(preg_match($this->patrones[6], $destino)) {
+                    if($result) {
+                         foreach ($result["objetos"] as $value) {
+                              preg_match($this->patrones[1], $value, $match);
 
-                    $result = $this->create_object($this->bucketname, "colorama_landings/" . $destino . "/" . $js, array(
-                         "body"                   => $nuevoobjeto,  
-                         "acl"                    => AmazonS3::ACL_PUBLIC,
-                         "contentType"            => "application/javascript",
-                         "headers"                => array(
-                              "Content-Encoding"  => "UTF-8",
-                              "Cache-Control"     => "max-age=60",
-                         ),
-                    ));
+                              $archivo  = $this->get_object($this->bucketname, $this->carpetabase . "/" . $value);
+                              $nuevoobjeto = str_replace($idOrigen, $idDestino, $archivo->body);
 
-                    if(!$result) {
-                         $response["success"] = false;
+                              $result = $this->create_object($this->bucketname, $destino . $match[0], array(
+                                   "body"                   => $nuevoobjeto,
+                                   "acl"                    => AmazonS3::ACL_PUBLIC,
+                                   "contentType"            => "application/javascript",
+                                   "headers"                => array(
+                                        "Content-Encoding"  => "UTF-8",
+                                        "Cache-Control"     => "max-age=60",
+                                   ),
+                              ));
 
-                         return $response;
+                               if(!$result) {
+                                   $response["success"] = false;
+                                   $response["error"] = "Se ha producido un error vuelvelo a intentar más tarde.";
+                                   
+                                   return $response;
+                              } 
+                         }
+                    }
+                    
+                    $response["success"] = true;
+                    $response["objeto"] = $idDestino;
+               }else{
+                    if($result) {
+                         foreach ($result["objetos"] as $value) {
+                              $archivo  = $this->get_object($this->bucketname, $this->carpetabase . "/" . $value);
+                              $nuevoobjeto = str_replace($idOrigen, $idDestino, $archivo->body);
+
+                              $result = $this->create_object($this->bucketname, $this->carpetabase . "/" . str_replace($idOrigen, $idDestino, $value), array(
+                                   "body"                   => $nuevoobjeto,
+                                   "acl"                    => AmazonS3::ACL_PUBLIC,
+                                   "contentType"            => "application/javascript",
+                                   "headers"                => array(
+                                        "Content-Encoding"  => "UTF-8",
+                                        "Cache-Control"     => "max-age=60",
+                                   ),
+                              ));
+
+                              if(!$result) {
+                                   $response["success"] = false;
+                                   $response["error"] = "Se ha producido un error vuelvelo a intentar más tarde.";
+                                   
+                                   return $response;
+                              } 
+                         }
                     }
                }
-
+               
                $response["success"] = true;
-               $response["objeto"] = $destino;
-
-               return $response;
+               $response["objeto"] = $idDestino;
           }
+
+          /**
+           * Copia de archivo a archivo
+           */
+          elseif(preg_match($this->patrones[1], $origen)
+          && preg_match($this->patrones[1], $destino)) {
+               $archivo  = $this->get_object($this->bucketname, $origen);
+               $nuevoobjeto = str_replace($idOrigen, $idDestino, $archivo->body);
+
+               $result = $this->create_object($this->bucketname, $destino, array(
+                    "body"                   => $nuevoobjeto,
+                    "acl"                    => AmazonS3::ACL_PUBLIC,
+                    "contentType"            => "application/javascript",
+                    "headers"                => array(
+                         "Content-Encoding"  => "UTF-8",
+                         "Cache-Control"     => "max-age=60",
+                    ),
+               ));
+
+               if($result) {
+                    $response["success"] = true;
+                    $response["objeto"] = $idDestino;
+               }else{
+                    $response["success"] = false;
+                    $response["error"] = "Se ha producido un error vuelvelo a intentar más tarde.";
+               }
+          }
+
+          /**
+           * Copia de archivo a carpeta
+           */
+          elseif(preg_match($this->patrones[1], $origen)
+          && !preg_match($this->patrones[1], $destino)) {
+               preg_match($this->patrones[1], $origen, $match);
+
+               $archivo  = $this->get_object($this->bucketname, $origen);
+               $nuevoobjeto = str_replace($idOrigen, $idDestino, $archivo->body);
+
+               $result = $this->create_object($this->bucketname, $destino . $match[0] , array(
+                    "body"                   => $nuevoobjeto,
+                    "acl"                    => AmazonS3::ACL_PUBLIC,
+                    "contentType"            => "application/javascript",
+                    "headers"                => array(
+                         "Content-Encoding"  => "UTF-8",
+                         "Cache-Control"     => "max-age=60",
+                    ),
+               ));
+
+               if($result) {
+                    $response["success"] = true;
+                    $response["objeto"] = $idDestino;
+               }else{
+                    $response["success"] = false;
+                    $response["error"] = "Se ha producido un error vuelvelo a intentar más tarde.";
+               }
+
+          }
+
+          /**
+           * Error no se puede copiar una carpeta dentro de un archivo
+           */
+          elseif(!preg_match($this->patrones[1], $origen)
+          && preg_match($this->patrones[1], $destino)) {
+               $response["success"] = false;
+               $response["error"] = "No se puede copiar de un directorio dentro de un archivo";
+          }
+
+          return $response;
      }
 
 
@@ -191,6 +312,74 @@ class s3helper extends AmazonS3 {
           }
           
           $response["success"] = true;
+
+          return $response;
+     }
+
+
+     /**
+      * [get_files_for_folders en desarrollo]
+      */
+     public function get_files_for_folders($tree = false) {
+          $estructuracorrecta = array();
+          $estructura = array();
+          
+          $archivos = $this->get_object_list($this->bucketname, array(
+               "pcre" => "/colorama_landings/"
+          ));
+         
+          unset($archivos[0]);
+
+          foreach ($archivos as $key => $value) {
+               if (preg_match($this->patrones[5], $value)) {
+                    unset($archivos[$key]);
+               }
+          }
+
+          foreach ($archivos as $value) {
+               $result = explode("/", $value);
+               preg_match($this->patrones[0], $value, $match);
+
+               $estructura[$result[1]]["label"] = $match[1];
+               $estructura[$result[1]]["ruta"] = $match[0];
+               
+               if (preg_match($this->patrones[1], $result[2])){
+                    $estructura[$result[1]]["children"][] = array(
+                         "label" => $result[count($result) - 1],
+                         "ruta" => $value,
+                    );
+               }else{
+                    $subfolders = array();
+                    $subfolders[$result[2]] = array(
+                         "label" => $result[count($result) - 1],
+                         "ruta" => $value,
+                    );
+
+                    $estructura[$result[1]]["children"][$result[2]]["label"] = $result[count($result) - 2];
+                    $estructura[$result[1]]["children"][$result[2]]["ruta"] = $match[0] . $result[count($result) - 2] . "/";
+                    $estructura[$result[1]]["children"][$result[2]]["children"][] = array(
+                         "label" => $result[count($result) - 1],
+                         "ruta" => $value,
+                    );
+               }
+          }
+
+          foreach ($estructura as $key => $value) {
+               $aux = 0;
+               $estructuracorrecta[$key]["label"] = $estructura[$key]["label"];
+               $estructuracorrecta[$key]["ruta"] = $estructura[$key]["ruta"];
+
+               foreach ($value["children"] as $k => $v) {
+                    $estructuracorrecta[$key]["children"][$aux] = $v;
+                    $aux++;
+               }
+          }
+
+          $response = array_values($estructuracorrecta);
+
+          if($tree) {
+               $response = array_values(array_merge($estructuracorrecta, $this->bucketsimplantar));
+          }
 
           return $response;
      }
@@ -230,11 +419,11 @@ class s3helper extends AmazonS3 {
       * [get_files_json obtiene el nombre de todas las configuraciones ".json" creadas para los skins de las landings]
       * @return [array] [nombres de los json de los skins]
       */
-     public function get_files_json($carpeta = null) {
+     public function get_files_json($carpeta = null, $orginal = true) {
           $wid = $carpeta;
           $response = array();
           $patron = "/[a-zA-Z0-9].js/i";          
-          $carpeta = ($carpeta)? "colorama_landings/" . $carpeta . "/" : "/colorama_landings/";
+          $carpeta = ($carpeta)? $carpeta : "/colorama_landings/";
           $carpetasplit = ($carpeta)? "/" . str_replace("/", "\/", $carpeta) . "/i" : "/colorama_landings/i";
 
           $archivos = $this->get_object_list($this->bucketname, array(
@@ -246,7 +435,10 @@ class s3helper extends AmazonS3 {
 
                foreach ($coincidencias as $value) {
                     list($basura, $archivo) = explode("colorama_landings/", $value);
-                    $archivo = str_replace("/", " - ", $archivo);
+                    
+                    $archivo = ($orginal)
+                    ? str_replace("/", " - ", $archivo) 
+                    : $archivo;
 
                     $response["objetos"][] = $archivo;
                }
@@ -287,13 +479,32 @@ class s3helper extends AmazonS3 {
       * @param  [string] $skin   [nombre del skin]
       * @return [array]
       */
-     public function delete_skin($portal, $folder, $skin) {
-          $objeto = ($folder)
-          ? "colorama_landings/". $portal . "/" . $folder . "/" . $skin . ".js"
-          : "colorama_landings/". $portal . "/" . $skin . ".js";
-          $result = $this->delete_object($this->bucketname, $objeto);
+     public function delete_skin($obj) {
+          $origen = $obj["objeto"]["origen"];
 
-          return $result->isOK();
+          if(!preg_match($this->patrones[1], $origen)){
+               $result = $this->get_files_json($origen, false);
+               
+               if($result) {
+                    foreach ($result["objetos"] as $value) {
+                         $result = $this->delete_object($this->bucketname, $this->carpetabase . "/" . $value);
+                         
+                         if(!$result->isOK()) {
+                              $response["success"] = false;
+                              
+                              return $response;
+                         }
+                    }
+
+                    $response["success"] = true;
+               }
+          }else{var_dump(2);
+               $result = $this->delete_object($this->bucketname, $obj["objeto"]["origen"]);
+
+               $response["success"] = ($result->isOK()) ? true : false;
+          }
+          
+          return $response;
      }
 
 
@@ -372,6 +583,7 @@ class s3helper extends AmazonS3 {
           return $this->portales_mobile;
      }
 
+
      /**
       * [get_landings obtiene todas las landings publicadas.]
       * @return [array] 
@@ -395,6 +607,11 @@ class s3helper extends AmazonS3 {
      }
 
 
+     /**
+      * [comprobar_carpeta comprueba si una carpeta esta asignada a un portal de contenido]
+      * @param  [array] $obj [array con todas las variables para crear el portal]
+      * @return [array]
+      */
      public function comprobar_carpeta($obj) {
           $wid = $obj["wid"];
           
@@ -416,11 +633,16 @@ class s3helper extends AmazonS3 {
      }
 
 
+     /**
+      * [updateorcreate_carpeta función que nos permite actualizar las carpetas por potal de contenido]
+      * @param  [array] $obj [array con toda las variables necesarias para la creación de la carpeta]
+      * @return [array]
+      */
      public function updateorcreate_carpeta($obj) {
           $wid = $obj["objeto"]["website"]["w_id"];
           $lfs = $obj["objeto"]["folders"];
 
-          $sql = "select * from alta_skinsfolders where id_portal = '$wid'";
+          $sql = "select * from altaskinsfolders where id_portal = '$wid'";
 
           $estado = $this->db->prepare($sql);
           $estado->execute();

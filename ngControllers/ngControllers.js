@@ -1,5 +1,6 @@
 var _controllers_ = angular.module("_controllers_", []);
 
+
 /**
  * Controlador principal de la aplicación;
  */
@@ -13,7 +14,6 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
      $scope.Landings = [];
      $scope.land_skin_folder = [];
      $scope.Mcolorama = {};
-     $scope.portalDuplicar = {};
      $scope.portalBorrar = {};
      $scope.envioDatos = true;     
      $scope.Portales = $window.Portales;
@@ -22,6 +22,10 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
      $scope.BucketLlenos = $window.BucketsConContenido["full"];
      $scope.BucketVacios = $window.BucketsConContenido["empty"];     
      $scope.CarpetaContenedoraDeSkins = [];
+     $scope.my_data_origen = $window.treedata_avm;
+     $scope.my_data_destino = $window.treedata_avm_implantados;
+     $scope.seleccionado1;
+     $scope.seleccionado2;
      $scope.cartasPago = [
           {
                nombre: "España",
@@ -37,17 +41,97 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
      $rootScope.listo = false;
      $rootScope.rootImg = null;
 
-     /**No olvidar borrar**/
-     // $scope.Portales[0].w_etiqueta_webiste = "skin1, skin2, skin3";
-     // $scope.Portales[1].w_etiqueta_webiste = "skin1, skin2, skin3, skin4";
-     /**No olvidar borrar**/
-
      $scope.cartaPago = $scope.cartasPago[0];
 
      $rootScope.$watch(function() {
           $scope.Mcolorama.dummyimg_backgroundimageanimated = $rootScope.rootName;
           $scope.Mcolorama.dummyimg_backgroundimage = $rootScope.rootImg;     
      });
+
+
+     /**
+      * [my_tree_handler En desarrollo]
+      */
+     $scope.my_tree_origen_handler = function(branch) {
+          $scope.seleccionado1 = branch.ruta;
+     };
+
+     $scope.my_tree_destino_handler = function(branch) {
+          $scope.seleccionado2 = branch.ruta;
+     };
+
+     $scope.copiarRama = function() {
+          $rootScope.listo = true;
+
+          if($scope.seleccionado1
+          && $scope.seleccionado2){
+               var obj = {
+                    origen: $scope.seleccionado1,
+                    destino: $scope.seleccionado2
+               }
+
+               $http.post("json.php", {
+                    objeto: obj,
+                    accion: "duplicar"
+               })
+               .success(function(data, status, headers, config) {
+                    if(data["success"]) {
+                         alert("Operación completada con exito");
+                         
+                         window.location.reload(true);
+                    }else{
+                         alert(data["error"]);
+                         
+                         $rootScope.listo = false;
+                    }
+               })
+               .error(function(data, status, headers, config) {
+                    $scope.permitidoBorrar = false;
+
+                    try{console.log("ERROR:", data)}catch(err) {};
+
+                    $rootScope.listo = false;
+               });
+          }else{
+               alert("Por favor selecciona un Origen y un Destino");
+               
+               $rootScope.listo = false;
+          }
+
+     }
+
+     $scope.borrarRama = function() {
+          $rootScope.listo = true;
+
+          if($scope.seleccionado1) {
+               var obj = {
+                    origen: $scope.seleccionado1
+               }
+
+               $http.post("json.php", {
+                    objeto: obj,
+                    accion: "borrar"
+               })
+               .success(function(data, status, headers, config) {
+                    if(data.success) {
+                         alert("Operación completada con exito");
+                         
+                         window.location.reload(true);
+                    }else{                        
+                         $rootScope.listo = false;
+                    }
+               })
+               .error(function(data, status, headers, config) {
+                    $scope.permitidoBorrar = false;
+
+                    try{console.log("ERROR:", data)}catch(err) {};
+
+                    $rootScope.listo = false;
+               });
+          }else{
+               alert("Por favor selecciona un Origen");
+          }
+     }
 
      /**
       * [descargarSkin Función que nos permite descarganos los skin js]
@@ -64,45 +148,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
       * [borrarSkin Función que nos permite borrar Skins que no se necesite]
       * @return {[null]}
       */
-     $scope.borrarSkin = function() {
-          $rootScope.listo = true;
-
-          $http.post("json.php", {
-               portal_id: $scope.Mcolorama.dummy_portal,
-               skin_folder: $scope.Mcolorama.dummy_skinfolder, 
-               skin_name: $scope.Mcolorama.dummynombre_null,
-               accion: "borrar"
-          })
-          .success(function(data, status, headers, config) {
-               if(data) {
-                    alert("Se ha borrado el SKIN: " + $scope.Mcolorama.dummynombre_null);
-
-                    angular.forEach($scope.Skins, function(value, key) {
-                         if(value == $scope.Mcolorama.dummy_portal + " - " + $scope.Mcolorama.dummynombre_null + ".js") {
-                              $scope.Skins.splice(key, 1);
-                         }
-                    });
-
-                    angular.forEach($scope.AllSkins, function(value, key) {
-                         if(value == $scope.Mcolorama.dummy_portal + " - " + $scope.Mcolorama.dummynombre_null + ".js") {
-                              $scope.AllSkins.splice(key, 1);
-                         }
-                    });
-                   
-                    $scope.Mcolorama = {};
-                    $scope.Mcolorama.dummyimg_backgroundimage = "";
-                    $rootScope.rootImg = "";
-
-                    $rootScope.listo = false;
-                    $scope.permitidoBorrar = false;
-               }
-          })
-          .error(function(data, status, headers, config) {
-               $scope.permitidoBorrar = false;
-               try{console.log("ERROR:", data)}catch(err) {};
-          });
-     }
-
+     
 
      /**
       * [getIMG Función que nos abre en una ventana nueva la IMAGEN actualmente usada en la configuración del colorama]
@@ -123,7 +169,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
 
           var texto = ($scope.menudesplegado)
           ? "CERRAR"
-          : "OPCIONES"
+          : "OPCIONES BUCKETS"
 
           angular.element($event.target).html(texto);
      }
@@ -189,52 +235,6 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
                .error(function(data, status, headers, config) {
                     try{console.log("ERROR:", data)}catch(err) {};
                });
-          }
-     }
-
-
-     /**
-      * [formularioS3clonar función para duplicar un bucket]
-      * @param  {[objeto]} $scope [contiene todas las variables de la applicación]
-      * @return {[objeto]}
-      */
-     $scope.formularioS3clonar = function($scope) {
-          $scope.duplicar = function(portalDuplicar) {
-               $rootScope.listo = true;
-
-               if($scope.formS3clonar.origen.$valid
-               && $scope.formS3clonar.destino.$valid
-               && $scope.formS3clonar.origen.$dirty
-               && $scope.formS3clonar.destino.$dirty) {
-
-                    var porigen = portalDuplicar.origen.split(" -- ");
-                    var pdestino = portalDuplicar.destino.split(" -- ");
-
-                    $http.post("json.php", {
-                         portal_origen: porigen[1],
-                         portal_destino: pdestino[1],
-                         accion: "duplicar"
-                    })
-                    .success(function(data, status, headers, config) {
-                         if(data["success"]) {
-                              window.top.location.reload();
-                              alert("El duplicado se se completo con éxito...");
-                         } else {
-                              $rootScope.listo = false;
-                              alert("Surgio un Error vuele a intentar más tarde...");
-                         }                         
-                    })
-                    .error(function(data, status, headers, config) {
-                         try{console.log("ERROR:", data)}catch(err) {};
-                         try{console.log("ERROR:", status)}catch(err) {};
-
-                         alert("Surgio un Error vuele a intentar más tarde...");
-                    });
-
-               } else {
-                    alert("Revisa tu bucket de Origen y tu bucket de Destino...");
-                    $rootScope.listo = false;
-               }
           }
      }
 
@@ -419,7 +419,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
       * [checkPortal chequea el portal si existe el portal y regresa los skins, caso contrario lo crea para poder almacenar los skins]
       * @param  {[string]} id [id del portal selecto]
       */
-     $scope.checkPortal = function(portal) {
+     $scope.checkPortal = function(portal) {          
           $scope.land_skin_folder = [];
           $scope.Landings = [];
           $rootScope.listo = true;
@@ -427,7 +427,7 @@ _controllers_.controller("mainController", function($rootScope, $scope, $window,
           $scope.Mcolorama.dummy_portal = portal.w_id;
 
           $http.post("json.php", {
-               portal_id: portal.w_id,
+               portal_id: "colorama_landings/" + portal.w_id,
                accion: "comprobar"
           })
           .success(function(data, status, headers, config) {

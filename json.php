@@ -43,12 +43,12 @@ if(isset($_GET["objetojson"]) && isset($_GET["portal"])) {
                break;
 
                case "borrar":
-                    $result = $s3h->delete_skin($get["portal_id"], $get["skin_folder"], $get["skin_name"]);
+                    $result = $s3h->delete_skin($get);
                     echo json_encode($result);
                break;
 
                case "duplicar":
-                    $result = $s3h->duplicate_buckets($get["portal_origen"], $get["portal_destino"]);
+                    $result = $s3h->duplicate_buckets($get);
                     echo json_encode($result);
                break;
 

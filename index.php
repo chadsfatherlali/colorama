@@ -11,7 +11,8 @@ $s3h->minifyHTML("inicio");
      <meta charset="UTF-8">
      <title>Colorama Landings</title>
      <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
-     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-theme.min.css">
+     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-theme.min.css">     
+     <link rel="stylesheet" type="text/css" href="modulos/tree/abn_tree.css">     
      <link rel="stylesheet" type="text/css" href="vendor/chosen.css">
      <link rel="stylesheet" type="text/css" href="chosen-spinner.css">
      <link href="colorpicker.css" rel="stylesheet">
@@ -20,10 +21,11 @@ $s3h->minifyHTML("inicio");
      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>     
      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
      <script type="text/javascript" src="http://code.angularjs.org/1.2.7/angular-route.min.js"></script>
-     <script type="text/javascript" src="http://code.angularjs.org/1.2.15/angular-sanitize.min.js"></script>     
+     <script type="text/javascript" src="http://code.angularjs.org/1.2.15/angular-sanitize.min.js"></script>   
      <script type="text/javascript" src="vendor/chosen.jquery.js"></script>
      <script type="text/javascript" src="chosen.js"></script>     
      <script type="text/javascript" src="bootstrap-colorpicker-module.js"></script>
+     <script type="text/javascript" src="modulos/tree/abn_tree_directive.js"></script>
 
      <script type="text/javascript" src="ngDirectives/ngDirectives.js"></script>
      <script type="text/javascript" src="ngFactories/ngFactories.js"></script>
@@ -46,7 +48,7 @@ $s3h->minifyHTML("inicio");
 
      <header ng-class="{menudesplegado: menudesplegado == true}">
           <div id="opciones" ng-include="'ngincludes/opciones.html'"></div>
-          <a id="menu" ng-click="desplegarmenu($event)">OPCIONES</a>
+          <a id="menu" ng-click="desplegarmenu($event)">OPCIONES BUCKETS</a>
      </header>
      
      <div id="wrapper">
@@ -77,11 +79,13 @@ $s3h->minifyHTML("inicio");
                <fieldset>
                     <legend>Todos los skins disponibles</legend>
                     
-                    <button id="borrarSkin" ng-if="permitidoBorrar" confirmed-click="borrarSkin()" ng-confirm-click>Borrar - Skin</button>
-                    <button id="descargarIMG" ng-if="Mcolorama.dummyimg_backgroundimage" ng-click="getIMG()">Descargar - Imagen BG</button>
-                    <button id="descargarSkin" ng-if="permitidoDescargar" ng-click="descargarSkin()">Descargar - Skin</button>
+                    <div>
+                         <button id="borrarSkin" ng-if="permitidoBorrar" confirmed-click="borrarSkin()" ng-confirm-click>Borrar - Skin</button>
+                         <button id="descargarIMG" ng-if="Mcolorama.dummyimg_backgroundimage" ng-click="getIMG()">Descargar - Imagen BG</button>
+                         <button id="descargarSkin" ng-if="permitidoDescargar" ng-click="descargarSkin()">Descargar - Skin</button>
+                    </div>
                     
-                    <select chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in AllSkins">
+                    <select id="todoslosskindisponibles" chosen no-results-text="'No hemos encontrado nada'" data-placeholder="Escoge un Skin" ng-model="skin" ng-change="setSkin(skin)" ng-options="s for s in AllSkins">
                          <option value=""></option>
                     </select>
                </fieldset>

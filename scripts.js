@@ -8,6 +8,7 @@
           "ngRoute", 
           "ngSanitize", 
           "localytics.directives",
+          "angularBootstrapNavTree",
           "_controllers_",
           "_directives_",
           "_factories_"
