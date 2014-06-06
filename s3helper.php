@@ -498,7 +498,7 @@ class s3helper extends AmazonS3 {
 
                     $response["success"] = true;
                }
-          }else{var_dump(2);
+          }else{
                $result = $this->delete_object($this->bucketname, $obj["objeto"]["origen"]);
 
                $response["success"] = ($result->isOK()) ? true : false;
