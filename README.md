@@ -1,18 +1,18 @@
 COLORAMA LANDINGS
 =================
 
-####Colorama panel configuración del skin:
+###Colorama panel configuración del skin:
 
 ![alt text](https://raw.githubusercontent.com/chadsfatherlali/colorama/master/imgscolorama/colorama1.png "Colorama: panel de modificación del SKIN")
 
-####Colorama con un skin cargado:
+###Colorama con un skin cargado:
 
 ![alt text](https://raw.githubusercontent.com/chadsfatherlali/colorama/master/imgscolorama/colorama2.png "Colorama: un skin cargado")
 
-####Colorama panel de acciones con los buckets:
+###Colorama panel de acciones con los buckets:
 
 ![alt text](https://raw.githubusercontent.com/chadsfatherlali/colorama/master/imgscolorama/colorama3.png "Colorama: panel de acciones con los buckets")
 
-####Colorama desplegado el colorpicker:
+###Colorama desplegado el colorpicker:
 
 ![alt text](https://raw.githubusercontent.com/chadsfatherlali/colorama/master/imgscolorama/colorama4.png "Colorama: desplegado el colorpicker:")
