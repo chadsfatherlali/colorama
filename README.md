@@ -12,3 +12,7 @@ COLORAMA LANDINGS
 ####Colorama panel de acciones con los buckets:
 
 ![alt text](https://raw.githubusercontent.com/chadsfatherlali/colorama/master/imgscolorama/colorama3.png "Colorama: panel de acciones con los buckets")
+
+####Colorama desplegado el colorpicker:
+
+![alt text](https://raw.githubusercontent.com/chadsfatherlali/colorama/master/imgscolorama/colorama4.png "Colorama: desplegado el colorpicker:")
